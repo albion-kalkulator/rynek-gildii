@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-4 -->
+<!-- build: rynek-gildii-5 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Rynek gildii – Albion Online</title>
 <style>
 :root{
@@ -257,7 +259,12 @@ select.fi option{background:var(--s2)}
 .gm-mtab{padding:12px 22px;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-weight:700;font-size:.9rem;transition:all .2s}
 .gm-mtab:hover{color:var(--text)}
 .gm-mtab.active{color:var(--gold-l);border-bottom-color:var(--gold)}
-.gm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding:0 2px}
+.gm-tags-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.gm-tags-hdr{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.gm-tag-search{width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.88rem;margin-bottom:8px}
+.gm-tag-search:focus{outline:none;border-color:var(--gold)}
+.gm-tags{display:flex;flex-wrap:wrap;gap:6px;max-height:min(240px,42vh);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 0}
+.gm-tags-empty{font-size:.82rem;color:var(--muted);padding:6px 2px}
 .gm-tag{padding:6px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
 .gm-tag:hover{border-color:var(--gold-d);color:var(--text)}
 .gm-tag.active{background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
@@ -381,6 +388,7 @@ pl:{
   gm_enchant:'Enchant', gm_city:'Miasto / lokalizacja',
   gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
   gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie', gm_tag_other:'Pozostałe',
+  gm_tag_search_ph:'Szukaj kategorii (np. hełm, broń, surowce)…', gm_tag_no_match:'Brak pasujących kategorii',
   gm_prof_title:'Profesja / rola (co oferujesz)',
   gm_prof_title_ph:'np. Tank T8, kucharz, zbieracz rudy, crafter zbroi płytowych…',
   gm_prof_note:'Opis (szczegóły, godziny, kontakt…)',
@@ -458,6 +466,7 @@ en:{
   gm_enchant:'Enchant', gm_city:'City / location',
   gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
   gm_tags_lbl:'Categories', gm_tag_all:'All', gm_tag_other:'Other',
+  gm_tag_search_ph:'Search categories (e.g. helm, weapon, resources)…', gm_tag_no_match:'No matching categories',
   gm_prof_title:'Profession / role (what you offer)',
   gm_prof_title_ph:'e.g. T8 tank, chef, ore gatherer, plate crafter…',
   gm_prof_note:'Description (details, hours, contact…)',
@@ -482,7 +491,19 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-4';
+const APP_VERSION = 'rynek-gildii-5';
+function ensureFreshHtmlVersion(){
+  const k='ao_guild_html_ver';
+  const prev=localStorage.getItem(k);
+  if(prev&&prev!==APP_VERSION&&!/[?&]_nc=/.test(location.search||'')){
+    localStorage.setItem(k,APP_VERSION);
+    const sep=location.search?'&':'?';
+    location.replace(location.pathname+location.search+sep+'_nc='+Date.now());
+    return true;
+  }
+  localStorage.setItem(k,APP_VERSION);
+  return false;
+}
 const QUALITY_KEYS = ['Normal','Good','Outstanding','Excellent','Masterpiece'];
 const QUALITY_CLASS = {
   Normal:'gm-q-normal', Good:'gm-q-good', Outstanding:'gm-q-outstanding',
@@ -630,23 +651,59 @@ function savePrefs(){localStorage.setItem('ao_guild_prefs',JSON.stringify({lang:
 function loadPrefs(){try{const d=JSON.parse(localStorage.getItem('ao_guild_prefs')||'{}');if(d.lang)state.lang=d.lang;if(d.activeCity)state.activeCity=d.activeCity;if(d.guildMainTab)guildMainTab=d.guildMainTab;}catch(_){}}
 
 const GM_TAGS=[
-  {id:'hammers',pl:'Młoty',en:'Hammers',match:b=>/HAMMER|MACE|QUARTERSTAFF|GAVEL/i.test(b)},
-  {id:'plate',pl:'Zbroje płytowe',en:'Plate armor',match:b=>/PLATE/i.test(b)},
-  {id:'leather',pl:'Skóra',en:'Leather',match:b=>/LEATHER/i.test(b)},
-  {id:'cloth',pl:'Tkanina',en:'Cloth',match:b=>/CLOTH|ROBE/i.test(b)},
-  {id:'bows',pl:'Łuki',en:'Bows',match:b=>/BOW|CROSSBOW/i.test(b)},
-  {id:'spears',pl:'Włócznie',en:'Spears',match:b=>/SPEAR|PIKE|HALBERD/i.test(b)},
-  {id:'swords',pl:'Miecze',en:'Swords',match:b=>/SWORD|SABRE|CLAYMORE|BROADSWORD/i.test(b)},
-  {id:'axes',pl:'Topory',en:'Axes',match:b=>/AXE|CHOPPER|CLEAVER|BEARPAW/i.test(b)},
-  {id:'daggers',pl:'Sztylety',en:'Daggers',match:b=>/DAGGER|CLAWS|DUAL/i.test(b)},
-  {id:'cursed',pl:'Klątwy / magia',en:'Cursed / arcane',match:b=>/CURSED|FIRE|FROST|HOLY|NATURE|ARCANE/i.test(b)},
-  {id:'mount',pl:'Wierzchowce',en:'Mounts',match:b=>/HORSE|OX|MOUNT|RAM|STAG|COUGAR|DIREWOLF|DONKEY/i.test(b)},
-  {id:'resources',pl:'Surowce',en:'Resources',match:b=>/ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|LEATHER|CLOTH|METALBAR|STONEBLOCK|REFINED|RAW/i.test(b)},
-  {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',match:b=>/^BAG|CAPE|SATCHEL/i.test(b)},
-  {id:'tools',pl:'Narzędzia',en:'Tools',match:b=>/TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b)},
+  {id:'weapons',pl:'Broń',en:'Weapons',keys:['broń','bron','weapon','miec','topor','łuk','luk','sztylet'],match:b=>/MAIN_|2H_/i.test(b)},
+  {id:'armor',pl:'Zbroje',en:'Armor',keys:['zbroj','armor','pancerz'],match:b=>/ARMOR_/i.test(b)},
+  {id:'helms',pl:'Hełmy',en:'Helms',keys:['hełm','helm','helmet','czapka'],match:b=>/HEAD_PLATE|HEAD_LEATHER/i.test(b)},
+  {id:'hoods',pl:'Kaptury',en:'Hoods',keys:['kaptur','hood','sorcerer','mask'],match:b=>/HEAD_CLOTH/i.test(b)},
+  {id:'shoes',pl:'Buty',en:'Shoes',keys:['buty','boot','shoe'],match:b=>/SHOES_/i.test(b)},
+  {id:'offhand',pl:'Off-hand',en:'Off-hand',keys:['offhand','tarcza','shield','księga','book','torch'],match:b=>/OFF_/i.test(b)},
+  {id:'gather_gear',pl:'Zbieracz (eq)',en:'Gatherer gear',keys:['zbieracz','gather','gath'],match:b=>/GATHERER_/i.test(b)},
+  {id:'plate',pl:'Płytowe',en:'Plate',keys:['płyt','plate'],match:b=>/PLATE/i.test(b)&&/ARMOR_|HEAD_|SHOES_/i.test(b)},
+  {id:'leather_gear',pl:'Skórzane (eq)',en:'Leather gear',keys:['skóra','leather'],match:b=>/LEATHER/i.test(b)&&/ARMOR_|HEAD_|SHOES_/i.test(b)},
+  {id:'cloth_gear',pl:'Tkanina (eq)',en:'Cloth gear',keys:['tkanin','cloth','robe'],match:b=>/(ARMOR_CLOTH|HEAD_CLOTH|SHOES_CLOTH|ROBE)/i.test(b)},
+  {id:'hammers',pl:'Młoty',en:'Hammers',keys:['młot','hammer','mace'],match:b=>/HAMMER|MACE|QUARTERSTAFF|GAVEL/i.test(b)},
+  {id:'bows',pl:'Łuki',en:'Bows',keys:['łuk','bow','crossbow'],match:b=>/BOW|CROSSBOW/i.test(b)},
+  {id:'spears',pl:'Włócznie',en:'Spears',keys:['włócz','spear','pike'],match:b=>/SPEAR|PIKE|HALBERD/i.test(b)},
+  {id:'swords',pl:'Miecze',en:'Swords',keys:['miecz','sword','sabre'],match:b=>/SWORD|SABRE|CLAYMORE|BROADSWORD/i.test(b)},
+  {id:'axes',pl:'Topory',en:'Axes',keys:['topor','axe'],match:b=>/AXE|CHOPPER|CLEAVER|BEARPAW/i.test(b)},
+  {id:'daggers',pl:'Sztylety',en:'Daggers',keys:['sztylet','dagger','claw'],match:b=>/DAGGER|CLAWS|DUAL/i.test(b)},
+  {id:'cursed',pl:'Klątwy / magia',en:'Cursed / arcane',keys:['kląt','curse','fire','frost','holy','arcane'],match:b=>/CURSED|FIRE|FROST|HOLY|NATURE|ARCANE/i.test(b)},
+  {id:'consumables',pl:'Consumables',en:'Consumables',keys:['potka','potion','jedzenie','food','fish'],match:b=>/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|CASSEROLE|SANDWICH|WORM|CABBAGE|BEAN/i.test(b)},
+  {id:'mount',pl:'Wierzchowce',en:'Mounts',keys:['mount','horse','koń','wierzch'],match:b=>/HORSE|OX|MOUNT|RAM|STAG|COUGAR|DIREWOLF|DONKEY/i.test(b)},
+  {id:'resources',pl:'Surowce',en:'Resources',keys:['surow','ore','ruda','hide','fiber','wood','rock'],match:b=>/(^|_|\/)(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW)/i.test(b)&&!/ARMOR_|HEAD_|SHOES_|MAIN_|2H_|OFF_|GATHERER_/i.test(b)},
+  {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',keys:['torba','bag','cape','peleryn'],match:b=>/^BAG|CAPE|SATCHEL/i.test(b)},
+  {id:'tools',pl:'Narzędzia',en:'Tools',keys:['tool','narzęd','sickle','pickaxe'],match:b=>/TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b)},
 ];
 let guildMainTab='market';
 let guildTagFilter='';
+let guildTagSearch='';
+function gmTagLabel(tag){return state.lang==='pl'?tag.pl:tag.en;}
+function tagsMatchingQuery(q){
+  const qq=(q||'').trim().toLowerCase();
+  if(!qq)return GM_TAGS;
+  return GM_TAGS.filter(tag=>{
+    if(gmTagLabel(tag).toLowerCase().includes(qq))return true;
+    if(tag.id.includes(qq))return true;
+    if((tag.keys||[]).some(k=>k.includes(qq)))return true;
+    return false;
+  });
+}
+function buildGuildTagPanel(){
+  const visible=tagsMatchingQuery(guildTagSearch);
+  const pills=visible.map(tag=>{
+    const lbl=gmTagLabel(tag);
+    return `<button type="button" class="gm-tag${guildTagFilter===tag.id?' active':''}" data-gm-tag="${tag.id}">${esc(lbl)}</button>`;
+  }).join('');
+  return`<div class="gm-tags-panel">
+    <div class="gm-tags-hdr">${t('gm_tags_lbl')}</div>
+    <input type="search" class="gm-tag-search" id="gm-tag-search-inp" value="${esc(guildTagSearch)}" placeholder="${esc(t('gm_tag_search_ph'))}" autocomplete="off" enterkeyhint="search">
+    <div class="gm-tags">
+      <button type="button" class="gm-tag${!guildTagFilter?' active':''}" data-gm-tag="">${t('gm_tag_all')}</button>
+      ${pills||`<span class="gm-tags-empty">${t('gm_tag_no_match')}</span>`}
+      <button type="button" class="gm-tag${guildTagFilter==='other'?' active':''}" data-gm-tag="other">${t('gm_tag_other')}</button>
+    </div>
+  </div>`;
+}
 
 // ══════════ GUILD MARKET ══════════
 const SB_GUILD_TABLE = 'guild_market';
@@ -736,6 +793,15 @@ function getFilteredGuildListings(){
     }else if(guildTagFilter){
       const tag=GM_TAGS.find(x=>x.id===guildTagFilter);
       if(tag&&!tag.match(listingMatchBase(l)))return false;
+    }else{
+      const tq=guildTagSearch.trim();
+      if(tq){
+        const matchTags=tagsMatchingQuery(tq);
+        if(matchTags.length){
+          const base=listingMatchBase(l);
+          if(!matchTags.some(tag=>tag.match(base)))return false;
+        }
+      }
     }
     if(!q)return true;
     return(l.item_name||'').toLowerCase().includes(q)||
@@ -878,14 +944,7 @@ function buildGuildMarketTab(){
       <button class="btn-rm" id="btn-gm-cancel">${t('gm_cancel')}</button>
     </div>
   </div>`:'';
-  const tagBar=`<div class="gm-tags" aria-label="${t('gm_tags_lbl')}">
-    <button type="button" class="gm-tag${!guildTagFilter?' active':''}" data-gm-tag="">${t('gm_tag_all')}</button>
-    ${GM_TAGS.map(tag=>{
-      const lbl=state.lang==='pl'?tag.pl:tag.en;
-      return `<button type="button" class="gm-tag${guildTagFilter===tag.id?' active':''}" data-gm-tag="${tag.id}">${esc(lbl)}</button>`;
-    }).join('')}
-    <button type="button" class="gm-tag${guildTagFilter==='other'?' active':''}" data-gm-tag="other">${t('gm_tag_other')}</button>
-  </div>`;
+  const tagBar=buildGuildTagPanel();
   const toolbar=`<div class="gm-toolbar">
     <div class="gm-filters">
       ${['all','sell','buy'].map(f=>{
@@ -1077,6 +1136,22 @@ function bindGuildMarket(){
     guildTagFilter=el.dataset.gmTag||'';
     render();
   }));
+  const tsi=document.getElementById('gm-tag-search-inp');
+  if(tsi){
+    tsi.addEventListener('input',()=>{
+      guildTagSearch=tsi.value;
+      guildTagFilter='';
+      const pos=tsi.selectionStart;
+      clearTimeout(_gmSearchTimer.tag);
+      _gmSearchTimer.tag=setTimeout(()=>{
+        render();
+        requestAnimationFrame(()=>{
+          const n=document.getElementById('gm-tag-search-inp');
+          if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(_){}}
+        });
+      },200);
+    });
+  }
   qsa('[data-gm-filter]').forEach(el=>on(el,'click',()=>{guildFilter=el.dataset.gmFilter;render();}));
   const si=document.getElementById('gm-search-inp');
   if(si){
@@ -1327,7 +1402,7 @@ function buildHeader(){
     <span class="logo-i">🏪</span>
     <div>
       <div class="logo-main">${t('main_guild')}</div>
-      <div class="logo-sub">Albion Online</div>
+      <div class="logo-sub">Albion Online · ${APP_VERSION}</div>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div class="lang-toggle" style="margin:0">
@@ -2226,6 +2301,7 @@ function bindLoginModal(){
 
 // ══════════ INIT ══════════
 try{
+if(ensureFreshHtmlVersion()){/* reload */}else{
 loadPrefs();
 (async()=>{
   if(cloudNick){
@@ -2238,6 +2314,7 @@ loadPrefs();
     bindLoginModal();
   }
 })();
+}
 }catch(err){
   console.error(err);
   document.body.innerHTML='<div style="max-width:520px;margin:40px auto;padding:24px;background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;color:#e8e8f0;font-family:sans-serif"><h2 style="color:#ffd700;margin:0 0 12px">Błąd ładowania</h2><p style="margin:0 0 10px">Rynek gildii nie mógł się uruchomić. Odśwież stronę (Ctrl+Shift+R).</p><p style="margin:0;font-size:.85rem;color:#aaa">'+String(err&&err.message||err)+'</p></div>';
