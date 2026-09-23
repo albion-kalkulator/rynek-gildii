@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-9 -->
+<!-- build: rynek-gildii-10 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -499,7 +499,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-9';
+const APP_VERSION = 'rynek-gildii-10';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -742,6 +742,8 @@ try{
   }
 }catch(_){}
 
+const GM_ENC=['.0','.1','.2','.3','.4'];
+function gmEncStr(level){return GM_ENC[+level]||'.0';}
 function guildItemIconUrl(entry){
   if(!entry.unique_base_name)return null;
   const tier=entry.tier||'T4';
@@ -756,6 +758,35 @@ function isNonQualityMaterial(baseName){
   if(!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_|BAG|CAPE)/.test(b)&&/(ORE|HIDE|FIBER|WOOD|ROCK|PLANK|METALBAR|STONEBLOCK)/i.test(b))return true;
   return false;
 }
+function itemHasResourceEnchant(baseName){
+  if(!baseName)return false;
+  const b=baseName.toUpperCase();
+  if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
+  if(/^BAG|^CAPE/.test(b))return false;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b))return false;
+  return /(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|STONEBLOCK|BLOCK|REFINED|CLOTH|LEATHER|FISHSAUCE|BLOODBROTH|ALCOHOL|ALCHEMY|EXTRACT|POWDER|RUNE|SOUL|RELIC)/i.test(b);
+}
+function itemHasGearEnchant(baseName){
+  if(!baseName)return false;
+  const b=baseName.toUpperCase();
+  if(b.startsWith('BAG')||b.startsWith('CAPE'))return false;
+  if(b.startsWith('2H_')||b.startsWith('MAIN_')||b.startsWith('OFF_'))return true;
+  if(b.startsWith('HEAD_')||b.startsWith('ARMOR_')||b.startsWith('SHOES_'))return true;
+  if(b.startsWith('GATHERER_'))return true;
+  return false;
+}
+function itemHasEnchant(baseName){
+  return itemHasGearEnchant(baseName)||itemHasResourceEnchant(baseName);
+}
+function guildMaxEnchantLevel(baseName){
+  if(itemHasEnchant(baseName))return 4;
+  return 0;
+}
+function guildEnchantLevels(baseName){
+  if(!itemHasEnchant(baseName))return [];
+  const top=guildMaxEnchantLevel(baseName);
+  return Array.from({length:top+1},(_,i)=>i);
+}
 function itemHasQuality(baseName,tier){
   if(!baseName||isNonQualityMaterial(baseName))return false;
   const b=baseName.toUpperCase();
@@ -765,19 +796,14 @@ function itemHasQuality(baseName,tier){
   if(b.startsWith('BAG')||b.startsWith('CAPE'))return true;
   return false;
 }
-function itemHasEnchant(baseName){
-  if(!baseName||isNonQualityMaterial(baseName))return false;
-  const b=baseName.toUpperCase();
-  if(b.startsWith('BAG')||b.startsWith('CAPE'))return false;
-  if(b.startsWith('2H_')||b.startsWith('MAIN_')||b.startsWith('OFF_'))return true;
-  if(b.startsWith('HEAD_')||b.startsWith('ARMOR_')||b.startsWith('SHOES_'))return true;
-  if(b.startsWith('GATHERER_'))return true;
-  return false;
-}
 function syncGuildFormQualityFlags(){
   if(!guildForm.unique_base_name)return;
   if(!itemHasQuality(guildForm.unique_base_name,guildForm.tier))guildForm.quality='Normal';
   if(!itemHasEnchant(guildForm.unique_base_name))guildForm.enchant=0;
+  else{
+    const max=guildMaxEnchantLevel(guildForm.unique_base_name);
+    if(+guildForm.enchant>max)guildForm.enchant=max;
+  }
 }
 function buildGuildIconHtml(entry,sizeClass){
   sizeClass=sizeClass||'gm-icon-lg';
@@ -969,7 +995,7 @@ function buildGuildMarketTab(){
   const previewHtml=hasItem?buildGuildIconHtml(gf,'gm-icon-preview'):'';
   const previewMeta=hasItem?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
     ${hasGearQ?guildQualityPillHtml(gf.quality):''}
-    ${hasEnchant?`<span style="font-size:.85rem;font-weight:700;color:var(--gold-l)">${esc(gf.tier||'T4')}${ENC[+gf.enchant||0]||'.0'}</span>`:''}
+    ${hasEnchant?`<span style="font-size:.85rem;font-weight:700;color:var(--gold-l)">${esc(gf.tier||'T4')}${gmEncStr(gf.enchant)}</span>`:''}
   </div>`:'';
   const formHtml=guildFormOpen?`<div class="gm-form">
     <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${guildEditingId?t('gm_form_title_edit'):t('gm_form_title_add')}</div>
@@ -1010,7 +1036,7 @@ function buildGuildMarketTab(){
       </div>`:''}
       ${hasEnchant?`<div class="fg"><div class="fl">${t('gm_enchant')}</div>
         <select class="fi" id="gm-enchant">
-          ${[0,1,2,3].map(v=>`<option value="${v}"${+gf.enchant===v?' selected':''}>${esc(gf.tier||'T4')}${ENC[v]}</option>`).join('')}
+          ${guildEnchantLevels(gf.unique_base_name).map(v=>`<option value="${v}"${+gf.enchant===v?' selected':''}>${esc(gf.tier||'T4')}${gmEncStr(v)}</option>`).join('')}
         </select>
       </div>`:''}
       <div class="fg"><div class="fl">${t('gm_price')}</div>
@@ -1045,7 +1071,7 @@ function buildGuildMarketTab(){
     const tc=TIER_C[l.tier]||'#aaa';
     const hasGearQ=itemHasQuality(l.unique_base_name,l.tier);
     const showEnc=guildShowEnchantInListing(l);
-    const enc=showEnc?(ENC[+l.enchant||0]||'.0'):'';
+    const enc=showEnc?gmEncStr(l.enchant):'';
     const showQual=guildShowQualityInListing(l);
     const total=(+l.price||0)*(+l.qty||1);
     const owner=isGuildOwner(l);
@@ -1303,13 +1329,15 @@ function bindGuildMarket(){
     if(!guildForm.item_name||!guildForm.unique_base_name){guildStatus=t('gm_no_item');render();return;}
     const hasGearQ=itemHasQuality(guildForm.unique_base_name,guildForm.tier);
     const hasEnc=itemHasEnchant(guildForm.unique_base_name);
+    const encMax=hasEnc?guildMaxEnchantLevel(guildForm.unique_base_name):0;
+    const encVal=hasEnc?Math.min(encMax,Math.max(0,+guildForm.enchant||0)):0;
     const payload={
       order_type:guildForm.order_type,
       item_name:guildForm.item_name,
       unique_base_name:guildForm.unique_base_name,
       tier:guildForm.tier,
       quality:hasGearQ?(guildForm.quality||'Normal'):'Normal',
-      enchant:hasEnc?(+guildForm.enchant||0):0,
+      enchant:encVal,
       price:+guildForm.price||0,
       qty:+guildForm.qty||1,
       note:guildForm.note||'',
