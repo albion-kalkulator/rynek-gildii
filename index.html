@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-7 -->
+<!-- build: rynek-gildii-7b -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -389,7 +389,7 @@ pl:{
   gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
   gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie', gm_tag_other:'Pozostałe',
   gm_tag_search_ph:'Szukaj kategorii (np. hełm, broń, surowce)…', gm_tag_no_match:'Brak pasujących kategorii',
-  gm_cloud_ok:(n)=>`☁️ Załadowano ${n} ogłoszeń z bazy (wspólne dla wszystkich urządzeń).`,
+  gm_cloud_ok:'☁️ Wczytano bazę danych.',
   gm_cloud_fail:'⚠️ Brak połączenia z bazą Supabase — widać tylko kopię zapisana w tej przeglądarce. Dotknij „Odśwież” lub sprawdź internet.',
   gm_filtered_empty:(h,f)=>`Filtry ukrywają ogłoszenia (${h} w bazie, widać ${f}).`,
   gm_clear_filters:'Wyczyść filtry',
@@ -471,7 +471,7 @@ en:{
   gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
   gm_tags_lbl:'Categories', gm_tag_all:'All', gm_tag_other:'Other',
   gm_tag_search_ph:'Search categories (e.g. helm, weapon, resources)…', gm_tag_no_match:'No matching categories',
-  gm_cloud_ok:(n)=>`☁️ Loaded ${n} listings from database (shared on all devices).`,
+  gm_cloud_ok:'☁️ Database loaded.',
   gm_cloud_fail:'⚠️ Could not reach Supabase — showing copy saved in this browser only. Tap Refresh or check your connection.',
   gm_filtered_empty:(h,f)=>`Filters hide listings (${h} total, ${f} visible).`,
   gm_clear_filters:'Clear filters',
@@ -499,7 +499,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-7';
+const APP_VERSION = 'rynek-gildii-7b';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -876,7 +876,7 @@ async function loadGuildMarket(){
       localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
       if(guildListings.length)nextGuildLocalId=Math.max(nextGuildLocalId,...guildListings.map(x=>+x.id||0))+1;
       guildCloudOk=true;
-      guildStatus=t('gm_cloud_ok')(getMarketListings().length);
+      guildStatus=t('gm_cloud_ok');
       return true;
     }
     guildCloudOk=false;
