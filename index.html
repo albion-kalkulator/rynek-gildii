@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-3 -->
+<!-- build: rynek-gildii-4 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -288,6 +288,12 @@ select.fi option{background:var(--s2)}
 .gm-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.72rem;font-weight:700;text-transform:uppercase}
 .gm-badge.sell{background:rgba(76,175,80,.15);color:#4caf50;border:1px solid rgba(76,175,80,.4)}
 .gm-badge.buy{background:rgba(85,153,255,.15);color:#5599ff;border:1px solid rgba(85,153,255,.4)}
+.gm-q-pill{display:inline-block;padding:2px 10px;border-radius:6px;font-size:.76rem;font-weight:700;border:1.5px solid}
+.gm-q-pill.gm-q-normal{border-color:#7a7a7a;color:#b0b0b0}
+.gm-q-pill.gm-q-good{border-color:#6a8fa8;color:#9ec4dc}
+.gm-q-pill.gm-q-outstanding{border-color:#c9782a;color:#e8a55a}
+.gm-q-pill.gm-q-excellent{border-color:#ffffff;color:#ffffff}
+.gm-q-pill.gm-q-masterpiece{border-color:#ffd700;color:#ffd700}
 .gm-nick{color:var(--gold);font-weight:600}
 .gm-note-text{font-size:.88rem;color:#d4cfe8;margin-top:6px;line-height:1.45}
 .gm-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
@@ -374,7 +380,7 @@ pl:{
   gm_form_title_add:'Nowe ogłoszenie', gm_form_title_edit:'Edycja ogłoszenia',
   gm_enchant:'Enchant', gm_city:'Miasto / lokalizacja',
   gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
-  gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie',
+  gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie', gm_tag_other:'Pozostałe',
   gm_prof_title:'Profesja / rola (co oferujesz)',
   gm_prof_title_ph:'np. Tank T8, kucharz, zbieracz rudy, crafter zbroi płytowych…',
   gm_prof_note:'Opis (szczegóły, godziny, kontakt…)',
@@ -451,7 +457,7 @@ en:{
   gm_form_title_add:'New listing', gm_form_title_edit:'Edit listing',
   gm_enchant:'Enchant', gm_city:'City / location',
   gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
-  gm_tags_lbl:'Categories', gm_tag_all:'All',
+  gm_tags_lbl:'Categories', gm_tag_all:'All', gm_tag_other:'Other',
   gm_prof_title:'Profession / role (what you offer)',
   gm_prof_title_ph:'e.g. T8 tank, chef, ore gatherer, plate crafter…',
   gm_prof_note:'Description (details, hours, contact…)',
@@ -476,7 +482,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-3';
+const APP_VERSION = 'rynek-gildii-4';
 const QUALITY_KEYS = ['Normal','Good','Outstanding','Excellent','Masterpiece'];
 const QUALITY_CLASS = {
   Normal:'gm-q-normal', Good:'gm-q-good', Outstanding:'gm-q-outstanding',
@@ -683,9 +689,10 @@ function itemHasQuality(baseName,tier){
 function buildGuildIconHtml(entry,sizeClass){
   sizeClass=sizeClass||'gm-icon-lg';
   const iconUrl=guildItemIconUrl(entry);
-  const hasQ=itemHasQuality(entry.unique_base_name,entry.tier);
+  const hasGearQ=itemHasQuality(entry.unique_base_name,entry.tier);
   const inner=iconUrl?`<img src="${esc(iconUrl)}" alt="" onerror="this.parentElement.textContent='📦'">`:'<span style="font-size:2.4rem;line-height:1">📦</span>';
-  if(!hasQ)return `<div class="gm-icon-wrap gm-icon-plain ${sizeClass}">${inner}</div>`;
+  if(!entry.unique_base_name)return `<div class="gm-icon-wrap gm-icon-plain ${sizeClass}">${inner}</div>`;
+  if(!hasGearQ)return `<div class="gm-icon-wrap gm-icon-plain ${sizeClass}">${inner}</div>`;
   const qClass=QUALITY_CLASS[entry.quality]||QUALITY_CLASS.Normal;
   return `<div class="gm-icon-wrap gm-icon-quality ${qClass} ${sizeClass}">${inner}</div>`;
 }
@@ -703,12 +710,30 @@ function isProfessionListing(l){return l.order_type==='profession';}
 function getMarketListings(){return guildListings.filter(l=>!isProfessionListing(l));}
 function getProfessionListings(){return guildListings.filter(l=>isProfessionListing(l));}
 function listingMatchBase(l){return ((l.unique_base_name||'')+'_'+(l.item_name||'')).toUpperCase();}
+function listingMatchesAnyCategory(base){
+  const b=(base||'').toUpperCase();
+  if(!b.trim())return false;
+  return GM_TAGS.some(tag=>tag.match(b));
+}
+function guildShowQualityInListing(l){
+  if(!l.unique_base_name)return false;
+  if(itemHasQuality(l.unique_base_name,l.tier))return true;
+  return !!(l.quality&&l.quality!=='Normal');
+}
+function guildQualityPillHtml(quality){
+  const q=quality||'Normal';
+  const cls=QUALITY_CLASS[q]||QUALITY_CLASS.Normal;
+  return `<span class="gm-q-pill ${cls}">${esc(tQ(q))}</span>`;
+}
 function getFilteredGuildListings(){
   const q=guildSearch.trim().toLowerCase();
   return getMarketListings().filter(l=>{
     if(guildFilter==='sell'&&l.order_type!=='sell')return false;
     if(guildFilter==='buy'&&l.order_type!=='buy')return false;
-    if(guildTagFilter){
+    if(guildTagFilter==='other'){
+      const base=listingMatchBase(l);
+      if(!base.trim()||listingMatchesAnyCategory(base))return false;
+    }else if(guildTagFilter){
       const tag=GM_TAGS.find(x=>x.id===guildTagFilter);
       if(tag&&!tag.match(listingMatchBase(l)))return false;
     }
@@ -793,8 +818,9 @@ async function deleteGuildListing(id){
 function buildGuildMarketTab(){
   const gf=guildForm;
   const filtered=getFilteredGuildListings();
-  const hasQ=gf.unique_base_name?itemHasQuality(gf.unique_base_name,gf.tier):false;
-  const previewHtml=gf.unique_base_name?buildGuildIconHtml(gf,'gm-icon-preview'):'';
+  const hasItem=!!gf.unique_base_name;
+  const hasGearQ=hasItem?itemHasQuality(gf.unique_base_name,gf.tier):false;
+  const previewHtml=hasItem?buildGuildIconHtml(gf,'gm-icon-preview'):'';
   const formHtml=guildFormOpen?`<div class="gm-form">
     <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${guildEditingId?t('gm_form_title_edit'):t('gm_form_title_add')}</div>
     <div class="gm-form-grid">
@@ -812,17 +838,27 @@ function buildGuildMarketTab(){
           }).join('')}
         </select>
       </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('lbl_name')}</div>
+      <div class="search-wrap">
+        <input type="text" class="fi" id="gm-item-search" style="width:100%;max-width:420px"
+          value="${esc(gf.item_name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
+        <div class="search-dd" id="gm-sdd" style="display:none;min-width:340px"></div>
+      </div>
+      ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}${hasGearQ?`<div style="margin-top:8px">${guildQualityPillHtml(gf.quality)}</div>`:''}</div>`:''}
+    </div>
+    <div class="gm-form-grid">
       <div class="fg"><div class="fl">${t('lbl_tier')}</div>
         <select class="fi" id="gm-tier">
           ${TIERS.map(tr=>`<option value="${tr}"${tr===gf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
         </select>
       </div>
-      ${hasQ?`<div class="fg"><div class="fl">${t('lbl_quality')}</div>
+      ${hasItem?`<div class="fg"><div class="fl">${t('lbl_quality')}</div>
         <select class="fi" id="gm-quality">
           ${QUALITY_KEYS.map(k=>`<option value="${k}"${k===gf.quality?' selected':''}>${tQ(k)}</option>`).join('')}
         </select>
-      </div>
-      <div class="fg"><div class="fl">${t('gm_enchant')}</div>
+      </div>`:''}
+      ${hasGearQ?`<div class="fg"><div class="fl">${t('gm_enchant')}</div>
         <select class="fi" id="gm-enchant">
           ${[0,1,2,3].map(v=>`<option value="${v}"${+gf.enchant===v?' selected':''}>${gf.tier}${ENC[v]}</option>`).join('')}
         </select>
@@ -833,14 +869,6 @@ function buildGuildMarketTab(){
       <div class="fg"><div class="fl">${t('gm_qty')}</div>
         <input type="number" class="fi" id="gm-qty" min="1" step="1" value="${esc(String(gf.qty||1))}">
       </div>
-    </div>
-    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('lbl_name')}</div>
-      <div class="search-wrap">
-        <input type="text" class="fi" id="gm-item-search" style="width:100%;max-width:420px"
-          value="${esc(gf.item_name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
-        <div class="search-dd" id="gm-sdd" style="display:none;min-width:340px"></div>
-      </div>
-      ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}</div>`:''}
     </div>
     <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_note')}</div>
       <input type="text" class="fi" id="gm-note" style="width:100%;max-width:520px" value="${esc(gf.note)}" placeholder="">
@@ -856,6 +884,7 @@ function buildGuildMarketTab(){
       const lbl=state.lang==='pl'?tag.pl:tag.en;
       return `<button type="button" class="gm-tag${guildTagFilter===tag.id?' active':''}" data-gm-tag="${tag.id}">${esc(lbl)}</button>`;
     }).join('')}
+    <button type="button" class="gm-tag${guildTagFilter==='other'?' active':''}" data-gm-tag="other">${t('gm_tag_other')}</button>
   </div>`;
   const toolbar=`<div class="gm-toolbar">
     <div class="gm-filters">
@@ -870,8 +899,9 @@ function buildGuildMarketTab(){
   </div>`;
   const listHtml=filtered.length?filtered.map(l=>{
     const tc=TIER_C[l.tier]||'#aaa';
-    const hasQ=itemHasQuality(l.unique_base_name,l.tier);
-    const enc=hasQ?(ENC[+l.enchant||0]||'.0'):'';
+    const hasGearQ=itemHasQuality(l.unique_base_name,l.tier);
+    const enc=hasGearQ?(ENC[+l.enchant||0]||'.0'):'';
+    const showQual=guildShowQualityInListing(l);
     const total=(+l.price||0)*(+l.qty||1);
     const owner=isGuildOwner(l);
     const cityData=guildCityInfo(l.city);
@@ -885,7 +915,7 @@ function buildGuildMarketTab(){
         <div class="gm-meta">
           ${cityData?`<span style="color:${cityData.color}">${cityData.icon} ${esc(l.city)}</span>`:''}
           <span style="color:${tc}">${l.tier}${enc}</span>
-          ${hasQ?`<span>· ${tQ(l.quality)}</span>`:''}
+          ${showQual?guildQualityPillHtml(l.quality||'Normal'):''}
           <span>· × ${l.qty||1}</span>
         </div>
         <div class="gm-price">${f(l.price)} 💰 ${state.lang==='pl'?'/ szt.':'/ unit'} · ${f(total)} 💰 ${state.lang==='pl'?'łącznie':'total'}</div>
@@ -1100,14 +1130,14 @@ function bindGuildMarket(){
   on('btn-gm-save','click',async()=>{
     readGuildFormFromDom();
     if(!guildForm.item_name||!guildForm.unique_base_name){guildStatus=t('gm_no_item');render();return;}
-    const hasQ=itemHasQuality(guildForm.unique_base_name,guildForm.tier);
+    const hasGearQ=itemHasQuality(guildForm.unique_base_name,guildForm.tier);
     const payload={
       order_type:guildForm.order_type,
       item_name:guildForm.item_name,
       unique_base_name:guildForm.unique_base_name,
       tier:guildForm.tier,
-      quality:hasQ?guildForm.quality:'Normal',
-      enchant:hasQ?(+guildForm.enchant||0):0,
+      quality:guildForm.quality||'Normal',
+      enchant:hasGearQ?(+guildForm.enchant||0):0,
       price:+guildForm.price||0,
       qty:+guildForm.qty||1,
       note:guildForm.note||'',
