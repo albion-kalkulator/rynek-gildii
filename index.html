@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-7b -->
+<!-- build: rynek-gildii-8 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -499,7 +499,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-7b';
+const APP_VERSION = 'rynek-gildii-8';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -668,8 +668,16 @@ const GM_TAGS=[
   {id:'shoes_plate',pl:'Buty płytowe',en:'Plate boots',keys:['buty płyt','plate boot','sabaton'],match:b=>/^SHOES_PLATE/.test(b)},
   {id:'shoes_sandal',pl:'Sandały (tkanina)',en:'Sandals (cloth)',keys:['sandał','sandal','buty tkan'],match:b=>/^SHOES_CLOTH/.test(b)},
   {id:'shoes_leather',pl:'Buty skórzane',en:'Leather shoes',keys:['buty skó','leather boot'],match:b=>/^SHOES_LEATHER/.test(b)},
-  {id:'weapon_2h',pl:'Broń oburęczna (2H)',en:'Two-handed (2H)',keys:['2h','oburęcz','dwuręcz','two hand'],match:b=>/^2H_/.test(b)},
-  {id:'weapon_1h',pl:'Broń jednoręczna (1H)',en:'One-handed (1H)',keys:['1h','jednoręcz','main hand','broń'],match:b=>/^MAIN_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'weapon_2h',pl:'Broń oburęczna (2H)',en:'Two-handed (2H)',keys:['2h','oburęcz','dwuręcz','two hand'],match:b=>/^2H_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'weapon_1h',pl:'Broń jednoręczna (1H)',en:'One-handed (1H)',keys:['1h','jednoręcz','main hand'],match:b=>/^MAIN_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'w_hammer',pl:'Młoty / buławy',en:'Hammers / maces',keys:['młot','hammer','mace','buława','gavel'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/HAMMER|MACE|GAVEL|MORNINGSTAR/i.test(b)},
+  {id:'w_bow',pl:'Łuki / kusze',en:'Bows / crossbows',keys:['łuk','bow','kusza','crossbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/BOW|CROSSBOW/i.test(b)},
+  {id:'w_staff',pl:'Kije / staffy',en:'Staves / quarterstaff',keys:['kij','staff','laska','quarterstaff','kostur'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/QUARTERSTAFF|STAFF|SCEPTER|WAND/i.test(b)&&!/HAMMER|MACE|GAVEL/i.test(b)},
+  {id:'w_sword',pl:'Miecze',en:'Swords',keys:['miecz','sword','sabre','rapier'],match:b=>/^MAIN_|^2H_/.test(b)&&/SWORD|SABRE|CLAYMORE|BROADSWORD|RAPIER|CARVING/i.test(b)},
+  {id:'w_axe',pl:'Topory',en:'Axes',keys:['topor','axe','cleaver'],match:b=>/^MAIN_|^2H_/.test(b)&&/AXE|CHOPPER|CLEAVER|BEARPAW|CARVE/i.test(b)&&!/PICKAXE/i.test(b)},
+  {id:'w_spear',pl:'Włócznie / halabardy',en:'Spears / halberds',keys:['włócz','spear','pike','halberd','trident'],match:b=>/^MAIN_|^2H_/.test(b)&&/SPEAR|PIKE|HALBERD|TRIDENT|GLAIVE|SPIKED/i.test(b)},
+  {id:'w_dagger',pl:'Sztylety / claw',en:'Daggers / claws',keys:['sztylet','dagger','claw','dual','pięści'],match:b=>/^MAIN_|^2H_/.test(b)&&/DAGGER|CLAW|DUAL|KNUCKLE|FIST/i.test(b)},
+  {id:'w_arcane',pl:'Broń magiczna',en:'Magic weapons',keys:['magia','arcane','fire','frost','holy','nature','curse','kląt'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/(CURSED|FIRE|FROST|HOLY|NATURE|ARCANE)/i.test(b)&&!/^(HEAD_|ARMOR_|SHOES_)/.test(b)},
   {id:'shields',pl:'Tarcze',en:'Shields',keys:['tarcza','shield'],match:b=>/SHIELD/.test(b)},
   {id:'offhand',pl:'Off-hand (bez tarcz)',en:'Off-hand (no shields)',keys:['offhand','torch','księga','book','świeca','orbe'],match:b=>/^OFF_/.test(b)&&!/SHIELD/.test(b)},
   {id:'gather_gear',pl:'Zbieracz (ekwipunek)',en:'Gatherer gear',keys:['zbieracz','gather','gath'],match:b=>/^GATHERER_/.test(b)},
