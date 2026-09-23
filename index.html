@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-2 -->
+<!-- build: rynek-gildii-3 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -375,12 +375,13 @@ pl:{
   gm_enchant:'Enchant', gm_city:'Miasto / lokalizacja',
   gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
   gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie',
-  gm_prof_title:'Profesja / rola', gm_prof_custom:'Inna (wpisz poniżej)',
-  gm_prof_note:'Opis (co oferujesz, godziny, kontakt…)',
+  gm_prof_title:'Profesja / rola (co oferujesz)',
+  gm_prof_title_ph:'np. Tank T8, kucharz, zbieracz rudy, crafter zbroi płytowych…',
+  gm_prof_note:'Opis (szczegóły, godziny, kontakt…)',
   gm_prof_icon:'Ikona (opcjonalnie — wyszukaj item)',
   gm_prof_add:'➕ Dodaj ogłoszenie', gm_prof_empty:'Brak ogłoszeń o profesjach.',
   gm_prof_form_add:'Nowe ogłoszenie — profesja', gm_prof_form_edit:'Edycja ogłoszenia',
-  gm_prof_no_title:'Wybierz lub wpisz profesję.',
+  gm_prof_no_title:'Wpisz profesję lub rolę.',
 },
 en:{
   tab_items:'⚔️ Items', tab_mats:'🔷 Materials', tab_settings:'⚙️ Settings',
@@ -451,12 +452,13 @@ en:{
   gm_enchant:'Enchant', gm_city:'City / location',
   gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
   gm_tags_lbl:'Categories', gm_tag_all:'All',
-  gm_prof_title:'Profession / role', gm_prof_custom:'Other (type below)',
-  gm_prof_note:'Description (what you offer, hours, contact…)',
+  gm_prof_title:'Profession / role (what you offer)',
+  gm_prof_title_ph:'e.g. T8 tank, chef, ore gatherer, plate crafter…',
+  gm_prof_note:'Description (details, hours, contact…)',
   gm_prof_icon:'Icon (optional — search item)',
   gm_prof_add:'➕ Post announcement', gm_prof_empty:'No profession announcements yet.',
   gm_prof_form_add:'New profession post', gm_prof_form_edit:'Edit announcement',
-  gm_prof_no_title:'Pick or enter a profession.',
+  gm_prof_no_title:'Enter your profession or role.',
 }};
 
 // ══════════ CONSTANTS ══════════
@@ -474,7 +476,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-2';
+const APP_VERSION = 'rynek-gildii-3';
 const QUALITY_KEYS = ['Normal','Good','Outstanding','Excellent','Masterpiece'];
 const QUALITY_CLASS = {
   Normal:'gm-q-normal', Good:'gm-q-good', Outstanding:'gm-q-outstanding',
@@ -637,25 +639,6 @@ const GM_TAGS=[
   {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',match:b=>/^BAG|CAPE|SATCHEL/i.test(b)},
   {id:'tools',pl:'Narzędzia',en:'Tools',match:b=>/TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b)},
 ];
-const PROFESSION_OPTS=[
-  {id:'warrior',pl:'Wojownik (tank / front)',en:'Warrior (tank / front)'},
-  {id:'brawler',pl:'Brawler / CC',en:'Brawler / CC'},
-  {id:'hunter',pl:'Łowca (DPS dystans)',en:'Hunter (ranged DPS)'},
-  {id:'mage',pl:'Mag (DPS)',en:'Mage (DPS)'},
-  {id:'healer',pl:'Uzdrowiciel',en:'Healer'},
-  {id:'support',pl:'Support / buffy',en:'Support / buffs'},
-  {id:'gather_ore',pl:'Zbieracz — ruda',en:'Gatherer — ore'},
-  {id:'gather_hide',pl:'Zbieracz — skóry',en:'Gatherer — hide'},
-  {id:'gather_fiber',pl:'Zbieracz — włókno',en:'Gatherer — fiber'},
-  {id:'gather_wood',pl:'Zbieracz — drewno',en:'Gatherer — wood'},
-  {id:'gather_stone',pl:'Zbieracz — kamień',en:'Gatherer — stone'},
-  {id:'refiner',pl:'Rafiner',en:'Refiner'},
-  {id:'crafter',pl:'Rzemieślnik / craft',en:'Crafter'},
-  {id:'chef',pl:'Kucharz / consumables',en:'Chef / consumables'},
-  {id:'laborer',pl:'Pracownik / laborer',en:'Laborer'},
-  {id:'scout',pl:'Scout / rozpoznanie',en:'Scout / recon'},
-  {id:'other',pl:'Inne',en:'Other'},
-];
 let guildMainTab='market';
 let guildTagFilter='';
 
@@ -673,8 +656,7 @@ let guildStatus = '';
 let nextGuildLocalId = 1;
 let profFormOpen=false;
 let profEditingId=null;
-let profForm={professionId:'warrior',customTitle:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
-let profSearchCtx='prof';
+let profForm={title:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
 try{
   const _gm=JSON.parse(localStorage.getItem(GM_LS_KEY)||'[]');
   if(Array.isArray(_gm)){
@@ -738,19 +720,11 @@ function getFilteredGuildListings(){
            (l.city||'').toLowerCase().includes(q);
   });
 }
-function profOptionLabel(id){
-  const o=PROFESSION_OPTS.find(x=>x.id===id);
-  if(!o)return id;
-  return state.lang==='pl'?o.pl:o.en;
-}
 function resetProfForm(){
   profFormOpen=false;profEditingId=null;guildStatus='';
-  profForm={professionId:'warrior',customTitle:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
+  profForm={title:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
 }
-function profDisplayTitle(pf){
-  if(pf.professionId==='other')return (pf.customTitle||'').trim();
-  return profOptionLabel(pf.professionId);
-}
+function profDisplayTitle(pf){return (pf.title||'').trim();}
 function buildGuildNickCol(l,owner){
   return`<div class="gm-nick-col">
     <span class="gm-nick-lbl">${state.lang==='pl'?'Gracz':'Player'}</span>
@@ -937,18 +911,10 @@ function buildProfessionTab(){
   const previewHtml=iconEntry?buildGuildIconHtml(pf,'gm-icon-preview'):'';
   const formHtml=profFormOpen?`<div class="gm-form">
     <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${profEditingId?t('gm_prof_form_edit'):t('gm_prof_form_add')}</div>
-    <div class="gm-form-grid">
-      <div class="fg" style="grid-column:1/-1"><div class="fl">${t('gm_prof_title')}</div>
-        <select class="fi" id="prof-kind" style="max-width:420px">
-          ${PROFESSION_OPTS.map(o=>{
-            const lbl=state.lang==='pl'?o.pl:o.en;
-            return `<option value="${o.id}"${pf.professionId===o.id?' selected':''}>${esc(lbl)}</option>`;
-          }).join('')}
-        </select>
-      </div>
-      ${pf.professionId==='other'?`<div class="fg" style="grid-column:1/-1"><div class="fl">${t('gm_prof_custom')}</div>
-        <input type="text" class="fi" id="prof-custom" style="max-width:420px" value="${esc(pf.customTitle)}" placeholder="">
-      </div>`:''}
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('gm_prof_title')}</div>
+      <input type="text" class="fi" id="prof-title" style="width:100%;max-width:520px" value="${esc(pf.title)}" placeholder="${esc(t('gm_prof_title_ph'))}" autocomplete="off">
+    </div>
+    <div class="gm-form-grid" style="margin-bottom:10px">
       <div class="fg"><div class="fl">${t('lbl_tier')}</div>
         <select class="fi" id="prof-tier">
           ${TIERS.map(tr=>`<option value="${tr}"${tr===pf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
@@ -982,7 +948,7 @@ function buildProfessionTab(){
     return`<div class="gm-card">
       ${iconHtml}
       <div class="gm-body">
-        <div class="gm-title">${esc(l.item_name||profOptionLabel('other'))}</div>
+        <div class="gm-title">${esc(l.item_name||'—')}</div>
         ${l.note?`<div class="gm-note-text" style="margin-top:8px">${esc(l.note)}</div>`:''}
         <div style="font-size:.75rem;color:var(--muted);margin-top:10px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
       </div>
@@ -1108,12 +1074,10 @@ function bindGuildMarket(){
   });
   on('btn-prof-cancel','click',()=>{resetProfForm();render();});
   on('btn-prof-save','click',async()=>{
-    const kindEl=document.getElementById('prof-kind');
-    const customEl=document.getElementById('prof-custom');
+    const titleEl=document.getElementById('prof-title');
     const noteEl=document.getElementById('prof-note');
     const tierEl=document.getElementById('prof-tier');
-    if(kindEl)profForm.professionId=kindEl.value;
-    if(customEl)profForm.customTitle=customEl.value;
+    if(titleEl)profForm.title=titleEl.value;
     if(noteEl)profForm.note=noteEl.value;
     if(tierEl)profForm.tier=tierEl.value;
     const title=profDisplayTitle(profForm);
@@ -1160,13 +1124,8 @@ function bindGuildMarket(){
       profEditingId=l.id;
       profFormOpen=true;
       guildMainTab='profession';
-      let pid='other',custom=(l.item_name||'').trim();
-      for(const o of PROFESSION_OPTS){
-        if(o.id==='other')continue;
-        if(custom===o.pl||custom===o.en){pid=o.id;custom='';break;}
-      }
       profForm={
-        professionId:pid,customTitle:custom,
+        title:(l.item_name||'').trim(),
         item_name:'',
         unique_base_name:l.unique_base_name||'',
         tier:l.tier||'T4',quality:l.quality||'Normal',enchant:+l.enchant||0,
@@ -1218,8 +1177,6 @@ function bindGuildMarket(){
     guildForm.enchant=+encEl.value||0;
     render();
   });
-  const profKind=document.getElementById('prof-kind');
-  if(profKind)profKind.addEventListener('change',()=>{profForm.professionId=profKind.value;render();});
   const profTier=document.getElementById('prof-tier');
   if(profTier)profTier.addEventListener('change',()=>{
     profForm.tier=profTier.value;
