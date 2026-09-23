@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-10 -->
+<!-- build: rynek-gildii-11 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -499,7 +499,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-10';
+const APP_VERSION = 'rynek-gildii-11';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -744,11 +744,31 @@ try{
 
 const GM_ENC=['.0','.1','.2','.3','.4'];
 function gmEncStr(level){return GM_ENC[+level]||'.0';}
-function guildItemIconUrl(entry){
+function normalizeItemBase(baseName,tier){
+  let b=(baseName||'').trim().toUpperCase();
+  const t=(tier||'T4').toUpperCase();
+  if(b.startsWith(t+'_'))b=b.slice(t.length+1);
+  b=b.replace(/^T\d+_/,'');
+  b=b.replace(/_LEVEL\d+@\d+$/i,'').replace(/@\d+$/i,'');
+  return b;
+}
+/** Klucz render.albiononline.com — surowce: T4_X_LEVEL2@2, ekwipunek: T4_X@2 */
+function guildItemRenderKey(entry){
   if(!entry.unique_base_name)return null;
-  const tier=entry.tier||'T4';
-  const enc=itemHasEnchant(entry.unique_base_name)&&(+entry.enchant)>0?`@${entry.enchant}`:'';
-  return`https://render.albiononline.com/v1/item/${encodeURIComponent(tier+'_'+entry.unique_base_name+enc)}.png`;
+  const tier=(entry.tier||'T4').toUpperCase();
+  const base=normalizeItemBase(entry.unique_base_name,tier);
+  const enc=Math.min(4,Math.max(0,+entry.enchant||0));
+  if(itemHasResourceEnchant(base)){
+    if(enc>0)return `${tier}_${base}_LEVEL${enc}@${enc}`;
+    return `${tier}_${base}`;
+  }
+  if(itemHasGearEnchant(base)&&enc>0)return `${tier}_${base}@${enc}`;
+  return `${tier}_${base}`;
+}
+function guildItemIconUrl(entry){
+  const key=guildItemRenderKey(entry);
+  if(!key)return null;
+  return`https://render.albiononline.com/v1/item/${encodeURIComponent(key)}.png`;
 }
 function isNonQualityMaterial(baseName){
   if(!baseName)return true;
@@ -760,7 +780,7 @@ function isNonQualityMaterial(baseName){
 }
 function itemHasResourceEnchant(baseName){
   if(!baseName)return false;
-  const b=baseName.toUpperCase();
+  const b=normalizeItemBase(baseName,'T4');
   if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
   if(/^BAG|^CAPE/.test(b))return false;
   if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b))return false;
@@ -768,7 +788,7 @@ function itemHasResourceEnchant(baseName){
 }
 function itemHasGearEnchant(baseName){
   if(!baseName)return false;
-  const b=baseName.toUpperCase();
+  const b=normalizeItemBase(baseName,'T4');
   if(b.startsWith('BAG')||b.startsWith('CAPE'))return false;
   if(b.startsWith('2H_')||b.startsWith('MAIN_')||b.startsWith('OFF_'))return true;
   if(b.startsWith('HEAD_')||b.startsWith('ARMOR_')||b.startsWith('SHOES_'))return true;
@@ -1215,7 +1235,7 @@ async function triggerGuildSearch(inp,ddId='gm-sdd',tierId='gm-tier'){
         if(!itemHasQuality(base,tier))profForm.enchant=0;
       }else{
         guildForm.item_name=dname;
-        guildForm.unique_base_name=base;
+        guildForm.unique_base_name=normalizeItemBase(base,tier);
         guildForm.tier=tier;
         syncGuildFormQualityFlags();
       }
