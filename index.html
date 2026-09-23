@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: rynek-gildii-1 -->
+<!-- build: rynek-gildii-2 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -253,7 +253,20 @@ select.fi option{background:var(--s2)}
 .gm-fbtn.active{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
 .gm-search{flex:1;min-width:160px;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.88rem}
 .gm-search:focus{outline:none;border-color:var(--gold)}
-.gm-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.gm-main-tabs{display:flex;gap:0;padding:0 20px;background:var(--s1);border-bottom:1px solid var(--border)}
+.gm-mtab{padding:12px 22px;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-weight:700;font-size:.9rem;transition:all .2s}
+.gm-mtab:hover{color:var(--text)}
+.gm-mtab.active{color:var(--gold-l);border-bottom-color:var(--gold)}
+.gm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding:0 2px}
+.gm-tag{padding:6px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+.gm-tag:hover{border-color:var(--gold-d);color:var(--text)}
+.gm-tag.active{background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+.gm-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:stretch;flex-wrap:nowrap}
+@media(max-width:640px){.gm-card{flex-wrap:wrap}}
+.gm-nick-col{margin-left:auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:6px;min-width:100px;flex-shrink:0;padding-left:12px;border-left:1px solid var(--border)}
+@media(max-width:640px){.gm-nick-col{width:100%;margin-left:0;border-left:none;border-top:1px solid var(--border);padding-left:0;padding-top:10px;align-items:flex-start;text-align:left}}
+.gm-nick-big{font-size:1.45rem;font-weight:800;color:var(--gold-l);line-height:1.15;word-break:break-word;max-width:180px}
+.gm-nick-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
 .gm-icon-wrap{flex-shrink:0;border-radius:12px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;box-sizing:border-box;overflow:hidden}
 .gm-icon-wrap.gm-icon-quality{border-style:solid;padding:6px}
 .gm-icon-wrap.gm-q-normal{border-color:#7a7a7a}
@@ -360,6 +373,14 @@ pl:{
   gm_confirm_del:'Usunąć to ogłoszenie?',
   gm_form_title_add:'Nowe ogłoszenie', gm_form_title_edit:'Edycja ogłoszenia',
   gm_enchant:'Enchant', gm_city:'Miasto / lokalizacja',
+  gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
+  gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie',
+  gm_prof_title:'Profesja / rola', gm_prof_custom:'Inna (wpisz poniżej)',
+  gm_prof_note:'Opis (co oferujesz, godziny, kontakt…)',
+  gm_prof_icon:'Ikona (opcjonalnie — wyszukaj item)',
+  gm_prof_add:'➕ Dodaj ogłoszenie', gm_prof_empty:'Brak ogłoszeń o profesjach.',
+  gm_prof_form_add:'Nowe ogłoszenie — profesja', gm_prof_form_edit:'Edycja ogłoszenia',
+  gm_prof_no_title:'Wybierz lub wpisz profesję.',
 },
 en:{
   tab_items:'⚔️ Items', tab_mats:'🔷 Materials', tab_settings:'⚙️ Settings',
@@ -428,6 +449,14 @@ en:{
   gm_confirm_del:'Delete this listing?',
   gm_form_title_add:'New listing', gm_form_title_edit:'Edit listing',
   gm_enchant:'Enchant', gm_city:'City / location',
+  gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
+  gm_tags_lbl:'Categories', gm_tag_all:'All',
+  gm_prof_title:'Profession / role', gm_prof_custom:'Other (type below)',
+  gm_prof_note:'Description (what you offer, hours, contact…)',
+  gm_prof_icon:'Icon (optional — search item)',
+  gm_prof_add:'➕ Post announcement', gm_prof_empty:'No profession announcements yet.',
+  gm_prof_form_add:'New profession post', gm_prof_form_edit:'Edit announcement',
+  gm_prof_no_title:'Pick or enter a profession.',
 }};
 
 // ══════════ CONSTANTS ══════════
@@ -445,7 +474,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-1';
+const APP_VERSION = 'rynek-gildii-2';
 const QUALITY_KEYS = ['Normal','Good','Outstanding','Excellent','Masterpiece'];
 const QUALITY_CLASS = {
   Normal:'gm-q-normal', Good:'gm-q-good', Outstanding:'gm-q-outstanding',
@@ -589,8 +618,46 @@ function parseMatKey(key){
 function listingIdMatch(a,b){return String(a)===String(b);}
 
 let state = { lang:'pl', activeCity:'Bridgewatch' };
-function savePrefs(){localStorage.setItem('ao_guild_prefs',JSON.stringify({lang:state.lang,activeCity:state.activeCity}));}
-function loadPrefs(){try{const d=JSON.parse(localStorage.getItem('ao_guild_prefs')||'{}');if(d.lang)state.lang=d.lang;if(d.activeCity)state.activeCity=d.activeCity;}catch(_){}}
+function savePrefs(){localStorage.setItem('ao_guild_prefs',JSON.stringify({lang:state.lang,activeCity:state.activeCity,guildMainTab}));}
+function loadPrefs(){try{const d=JSON.parse(localStorage.getItem('ao_guild_prefs')||'{}');if(d.lang)state.lang=d.lang;if(d.activeCity)state.activeCity=d.activeCity;if(d.guildMainTab)guildMainTab=d.guildMainTab;}catch(_){}}
+
+const GM_TAGS=[
+  {id:'hammers',pl:'Młoty',en:'Hammers',match:b=>/HAMMER|MACE|QUARTERSTAFF|GAVEL/i.test(b)},
+  {id:'plate',pl:'Zbroje płytowe',en:'Plate armor',match:b=>/PLATE/i.test(b)},
+  {id:'leather',pl:'Skóra',en:'Leather',match:b=>/LEATHER/i.test(b)},
+  {id:'cloth',pl:'Tkanina',en:'Cloth',match:b=>/CLOTH|ROBE/i.test(b)},
+  {id:'bows',pl:'Łuki',en:'Bows',match:b=>/BOW|CROSSBOW/i.test(b)},
+  {id:'spears',pl:'Włócznie',en:'Spears',match:b=>/SPEAR|PIKE|HALBERD/i.test(b)},
+  {id:'swords',pl:'Miecze',en:'Swords',match:b=>/SWORD|SABRE|CLAYMORE|BROADSWORD/i.test(b)},
+  {id:'axes',pl:'Topory',en:'Axes',match:b=>/AXE|CHOPPER|CLEAVER|BEARPAW/i.test(b)},
+  {id:'daggers',pl:'Sztylety',en:'Daggers',match:b=>/DAGGER|CLAWS|DUAL/i.test(b)},
+  {id:'cursed',pl:'Klątwy / magia',en:'Cursed / arcane',match:b=>/CURSED|FIRE|FROST|HOLY|NATURE|ARCANE/i.test(b)},
+  {id:'mount',pl:'Wierzchowce',en:'Mounts',match:b=>/HORSE|OX|MOUNT|RAM|STAG|COUGAR|DIREWOLF|DONKEY/i.test(b)},
+  {id:'resources',pl:'Surowce',en:'Resources',match:b=>/ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|LEATHER|CLOTH|METALBAR|STONEBLOCK|REFINED|RAW/i.test(b)},
+  {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',match:b=>/^BAG|CAPE|SATCHEL/i.test(b)},
+  {id:'tools',pl:'Narzędzia',en:'Tools',match:b=>/TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b)},
+];
+const PROFESSION_OPTS=[
+  {id:'warrior',pl:'Wojownik (tank / front)',en:'Warrior (tank / front)'},
+  {id:'brawler',pl:'Brawler / CC',en:'Brawler / CC'},
+  {id:'hunter',pl:'Łowca (DPS dystans)',en:'Hunter (ranged DPS)'},
+  {id:'mage',pl:'Mag (DPS)',en:'Mage (DPS)'},
+  {id:'healer',pl:'Uzdrowiciel',en:'Healer'},
+  {id:'support',pl:'Support / buffy',en:'Support / buffs'},
+  {id:'gather_ore',pl:'Zbieracz — ruda',en:'Gatherer — ore'},
+  {id:'gather_hide',pl:'Zbieracz — skóry',en:'Gatherer — hide'},
+  {id:'gather_fiber',pl:'Zbieracz — włókno',en:'Gatherer — fiber'},
+  {id:'gather_wood',pl:'Zbieracz — drewno',en:'Gatherer — wood'},
+  {id:'gather_stone',pl:'Zbieracz — kamień',en:'Gatherer — stone'},
+  {id:'refiner',pl:'Rafiner',en:'Refiner'},
+  {id:'crafter',pl:'Rzemieślnik / craft',en:'Crafter'},
+  {id:'chef',pl:'Kucharz / consumables',en:'Chef / consumables'},
+  {id:'laborer',pl:'Pracownik / laborer',en:'Laborer'},
+  {id:'scout',pl:'Scout / rozpoznanie',en:'Scout / recon'},
+  {id:'other',pl:'Inne',en:'Other'},
+];
+let guildMainTab='market';
+let guildTagFilter='';
 
 // ══════════ GUILD MARKET ══════════
 const SB_GUILD_TABLE = 'guild_market';
@@ -604,6 +671,10 @@ let guildForm = {order_type:'sell',item_name:'',unique_base_name:'',tier:'T4',qu
 let guildLoading = false;
 let guildStatus = '';
 let nextGuildLocalId = 1;
+let profFormOpen=false;
+let profEditingId=null;
+let profForm={professionId:'warrior',customTitle:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
+let profSearchCtx='prof';
 try{
   const _gm=JSON.parse(localStorage.getItem(GM_LS_KEY)||'[]');
   if(Array.isArray(_gm)){
@@ -646,11 +717,19 @@ function fmtGuildDate(iso){
 function isGuildOwner(listing){
   return cloudNick&&listing.nick&&listing.nick.toLowerCase()===cloudNick.toLowerCase();
 }
+function isProfessionListing(l){return l.order_type==='profession';}
+function getMarketListings(){return guildListings.filter(l=>!isProfessionListing(l));}
+function getProfessionListings(){return guildListings.filter(l=>isProfessionListing(l));}
+function listingMatchBase(l){return ((l.unique_base_name||'')+'_'+(l.item_name||'')).toUpperCase();}
 function getFilteredGuildListings(){
   const q=guildSearch.trim().toLowerCase();
-  return guildListings.filter(l=>{
+  return getMarketListings().filter(l=>{
     if(guildFilter==='sell'&&l.order_type!=='sell')return false;
     if(guildFilter==='buy'&&l.order_type!=='buy')return false;
+    if(guildTagFilter){
+      const tag=GM_TAGS.find(x=>x.id===guildTagFilter);
+      if(tag&&!tag.match(listingMatchBase(l)))return false;
+    }
     if(!q)return true;
     return(l.item_name||'').toLowerCase().includes(q)||
            (l.nick||'').toLowerCase().includes(q)||
@@ -658,6 +737,29 @@ function getFilteredGuildListings(){
            (l.tier||'').toLowerCase().includes(q)||
            (l.city||'').toLowerCase().includes(q);
   });
+}
+function profOptionLabel(id){
+  const o=PROFESSION_OPTS.find(x=>x.id===id);
+  if(!o)return id;
+  return state.lang==='pl'?o.pl:o.en;
+}
+function resetProfForm(){
+  profFormOpen=false;profEditingId=null;guildStatus='';
+  profForm={professionId:'warrior',customTitle:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
+}
+function profDisplayTitle(pf){
+  if(pf.professionId==='other')return (pf.customTitle||'').trim();
+  return profOptionLabel(pf.professionId);
+}
+function buildGuildNickCol(l,owner){
+  return`<div class="gm-nick-col">
+    <span class="gm-nick-lbl">${state.lang==='pl'?'Gracz':'Player'}</span>
+    <span class="gm-nick-big">${esc(l.nick||'?')}</span>
+    ${owner?`<div class="gm-actions" style="margin-top:8px;flex-direction:row;flex-wrap:wrap;justify-content:flex-end">
+      <button type="button" class="btn-add" style="padding:5px 10px;font-size:.78rem" data-gm-edit="${l.id}">${t('gm_edit')}</button>
+      <button type="button" class="btn-rm" style="padding:5px 10px;font-size:.78rem" data-gm-delete="${l.id}">${t('gm_delete')}</button>
+    </div>`:''}
+  </div>`;
 }
 function resetGuildForm(){
   guildFormOpen=false;guildEditingId=null;guildStatus='';
@@ -774,6 +876,13 @@ function buildGuildMarketTab(){
       <button class="btn-rm" id="btn-gm-cancel">${t('gm_cancel')}</button>
     </div>
   </div>`:'';
+  const tagBar=`<div class="gm-tags" aria-label="${t('gm_tags_lbl')}">
+    <button type="button" class="gm-tag${!guildTagFilter?' active':''}" data-gm-tag="">${t('gm_tag_all')}</button>
+    ${GM_TAGS.map(tag=>{
+      const lbl=state.lang==='pl'?tag.pl:tag.en;
+      return `<button type="button" class="gm-tag${guildTagFilter===tag.id?' active':''}" data-gm-tag="${tag.id}">${esc(lbl)}</button>`;
+    }).join('')}
+  </div>`;
   const toolbar=`<div class="gm-toolbar">
     <div class="gm-filters">
       ${['all','sell','buy'].map(f=>{
@@ -804,18 +913,82 @@ function buildGuildMarketTab(){
           <span style="color:${tc}">${l.tier}${enc}</span>
           ${hasQ?`<span>· ${tQ(l.quality)}</span>`:''}
           <span>· × ${l.qty||1}</span>
-          <span class="gm-nick">${t('gm_by')}${esc(l.nick||'?')}</span>
         </div>
         <div class="gm-price">${f(l.price)} 💰 ${state.lang==='pl'?'/ szt.':'/ unit'} · ${f(total)} 💰 ${state.lang==='pl'?'łącznie':'total'}</div>
         ${l.note?`<div class="gm-note-text">${esc(l.note)}</div>`:''}
         <div style="font-size:.75rem;color:var(--muted);margin-top:6px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
       </div>
-      ${owner?`<div class="gm-actions">
-        <button type="button" class="btn-add" style="padding:5px 10px;font-size:.78rem" data-gm-edit="${l.id}">${t('gm_edit')}</button>
-        <button type="button" class="btn-rm" style="padding:5px 10px;font-size:.78rem" data-gm-delete="${l.id}">${t('gm_delete')}</button>
-      </div>`:''}
+      ${buildGuildNickCol(l,owner)}
     </div>`;
   }).join(''):`<div class="pn" style="padding:24px;text-align:center">${t('gm_empty')}</div>`;
+  return`<div class="gm-page"><div style="padding:16px">
+    ${toolbar}
+    ${tagBar}
+    ${formHtml}
+    <div class="gm-status">${guildLoading?t('gm_loading'):esc(guildStatus)}</div>
+    ${listHtml}
+    <div style="text-align:center;font-size:.72rem;color:var(--muted);padding:16px 0 4px;opacity:.7">${state.lang==='pl'?'Wersja':'Version'}: ${APP_VERSION}</div>
+  </div></div>`;
+}
+function buildProfessionTab(){
+  const pf=profForm;
+  const listings=getProfessionListings();
+  const iconEntry=pf.unique_base_name?pf:null;
+  const previewHtml=iconEntry?buildGuildIconHtml(pf,'gm-icon-preview'):'';
+  const formHtml=profFormOpen?`<div class="gm-form">
+    <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${profEditingId?t('gm_prof_form_edit'):t('gm_prof_form_add')}</div>
+    <div class="gm-form-grid">
+      <div class="fg" style="grid-column:1/-1"><div class="fl">${t('gm_prof_title')}</div>
+        <select class="fi" id="prof-kind" style="max-width:420px">
+          ${PROFESSION_OPTS.map(o=>{
+            const lbl=state.lang==='pl'?o.pl:o.en;
+            return `<option value="${o.id}"${pf.professionId===o.id?' selected':''}>${esc(lbl)}</option>`;
+          }).join('')}
+        </select>
+      </div>
+      ${pf.professionId==='other'?`<div class="fg" style="grid-column:1/-1"><div class="fl">${t('gm_prof_custom')}</div>
+        <input type="text" class="fi" id="prof-custom" style="max-width:420px" value="${esc(pf.customTitle)}" placeholder="">
+      </div>`:''}
+      <div class="fg"><div class="fl">${t('lbl_tier')}</div>
+        <select class="fi" id="prof-tier">
+          ${TIERS.map(tr=>`<option value="${tr}"${tr===pf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('gm_prof_icon')}</div>
+      <div class="search-wrap">
+        <input type="text" class="fi" id="prof-item-search" style="width:100%;max-width:420px"
+          value="${esc(pf.item_name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
+        <div class="search-dd" id="prof-sdd" style="display:none;min-width:340px"></div>
+      </div>
+      ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}</div>`:''}
+    </div>
+    <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_prof_note')}</div>
+      <textarea class="fi" id="prof-note" rows="4" style="width:100%;max-width:520px;resize:vertical">${esc(pf.note)}</textarea>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-add" id="btn-prof-save">${t('gm_save')}</button>
+      <button class="btn-rm" id="btn-prof-cancel">${t('gm_cancel')}</button>
+    </div>
+  </div>`:'';
+  const toolbar=`<div class="gm-toolbar">
+    <span style="font-size:.85rem;color:var(--muted);flex:1">${state.lang==='pl'?'Ogłoszenia o profesji / roli w gildii':'Guild profession / role announcements'}</span>
+    <button type="button" class="btn-add" id="btn-gm-refresh" style="padding:8px 14px;font-size:.82rem">${t('gm_refresh')}</button>
+    <button type="button" class="btn-add" id="btn-prof-add" style="padding:8px 14px;font-size:.82rem"${cloudNick?'':' disabled title="'+esc(t('gm_login_required'))+'"'}>${t('gm_prof_add')}</button>
+  </div>`;
+  const listHtml=listings.length?listings.map(l=>{
+    const owner=isGuildOwner(l);
+    const iconHtml=l.unique_base_name?buildGuildIconHtml(l,'gm-icon-lg'):`<div class="gm-icon-wrap gm-icon-plain gm-icon-lg"><span style="font-size:2.8rem">📣</span></div>`;
+    return`<div class="gm-card">
+      ${iconHtml}
+      <div class="gm-body">
+        <div class="gm-title">${esc(l.item_name||profOptionLabel('other'))}</div>
+        ${l.note?`<div class="gm-note-text" style="margin-top:8px">${esc(l.note)}</div>`:''}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:10px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
+      </div>
+      ${buildGuildNickCol(l,owner)}
+    </div>`;
+  }).join(''):`<div class="pn" style="padding:24px;text-align:center">${t('gm_prof_empty')}</div>`;
   return`<div class="gm-page"><div style="padding:16px">
     ${toolbar}
     ${formHtml}
@@ -825,17 +998,17 @@ function buildGuildMarketTab(){
   </div></div>`;
 }
 const _gmSearchTimer={};
-async function triggerGuildSearch(inp){
+async function triggerGuildSearch(inp,ddId='gm-sdd',tierId='gm-tier'){
   const query=inp.value.trim();
-  const dd=document.getElementById('gm-sdd');
+  const dd=document.getElementById(ddId);
   if(!dd)return;
   if(query.length<2){dd.style.display='none';return;}
   dd.style.display='block';
   dd.innerHTML=`<div class="sdd-msg">${t('search_searching')}</div>`;
   clearTimeout(_gmSearchTimer.t);
   _gmSearchTimer.t=setTimeout(async()=>{
-    const tierEl=document.getElementById('gm-tier');
-    const tier=tierEl?tierEl.value:guildForm.tier;
+    const tierEl=document.getElementById(tierId);
+    const tier=tierEl?tierEl.value:(tierId==='prof-tier'?profForm.tier:guildForm.tier);
     if(!_itemDB)dd.innerHTML=`<div class="sdd-msg">${t('search_loading')}</div>`;
     const db=await getItemDB();
     if(!db||!Object.keys(db).length){dd.innerHTML=`<div class="sdd-msg">${t('search_err')}</div>`;return;}
@@ -860,9 +1033,16 @@ async function triggerGuildSearch(inp){
     dd.querySelectorAll('.sdd-item').forEach(el=>el.addEventListener('mousedown',e=>{
       e.preventDefault();
       const uname=el.dataset.gmPick,dname=el.dataset.gmDname;
-      guildForm.item_name=dname;
-      guildForm.unique_base_name=uname.replace(/^T\d+_/,'');
-      if(!itemHasQuality(guildForm.unique_base_name,tier))guildForm.enchant=0;
+      const base=uname.replace(/^T\d+_/,'');
+      if(tierId==='prof-tier'){
+        profForm.item_name=dname;
+        profForm.unique_base_name=base;
+        if(!itemHasQuality(base,tier))profForm.enchant=0;
+      }else{
+        guildForm.item_name=dname;
+        guildForm.unique_base_name=base;
+        if(!itemHasQuality(guildForm.unique_base_name,tier))guildForm.enchant=0;
+      }
       inp.value=dname;
       dd.style.display='none';
       render();
@@ -890,6 +1070,17 @@ function readGuildFormFromDom(){
   if(si&&!guildForm.unique_base_name)guildForm.item_name=si.value;
 }
 function bindGuildMarket(){
+  qsa('[data-gm-main]').forEach(el=>on(el,'click',()=>{
+    const m=el.dataset.gmMain;
+    if(!m||m===guildMainTab)return;
+    guildMainTab=m;
+    guildStatus='';
+    render();
+  }));
+  qsa('[data-gm-tag]').forEach(el=>on(el,'click',()=>{
+    guildTagFilter=el.dataset.gmTag||'';
+    render();
+  }));
   qsa('[data-gm-filter]').forEach(el=>on(el,'click',()=>{guildFilter=el.dataset.gmFilter;render();}));
   const si=document.getElementById('gm-search-inp');
   if(si){
@@ -909,7 +1100,37 @@ function bindGuildMarket(){
   on('btn-gm-refresh','click',async()=>{guildStatus='';await loadGuildMarket();render();});
   on('btn-gm-add','click',()=>{
     if(!cloudNick){guildStatus=t('gm_login_required');render();return;}
-    resetGuildForm();guildFormOpen=true;render();
+    resetProfForm();resetGuildForm();guildFormOpen=true;render();
+  });
+  on('btn-prof-add','click',()=>{
+    if(!cloudNick){guildStatus=t('gm_login_required');render();return;}
+    resetGuildForm();resetProfForm();profFormOpen=true;render();
+  });
+  on('btn-prof-cancel','click',()=>{resetProfForm();render();});
+  on('btn-prof-save','click',async()=>{
+    const kindEl=document.getElementById('prof-kind');
+    const customEl=document.getElementById('prof-custom');
+    const noteEl=document.getElementById('prof-note');
+    const tierEl=document.getElementById('prof-tier');
+    if(kindEl)profForm.professionId=kindEl.value;
+    if(customEl)profForm.customTitle=customEl.value;
+    if(noteEl)profForm.note=noteEl.value;
+    if(tierEl)profForm.tier=tierEl.value;
+    const title=profDisplayTitle(profForm);
+    if(!title){guildStatus=t('gm_prof_no_title');render();return;}
+    const hasQ=profForm.unique_base_name?itemHasQuality(profForm.unique_base_name,profForm.tier):false;
+    const payload={
+      order_type:'profession',
+      item_name:title,
+      unique_base_name:profForm.unique_base_name||'',
+      tier:profForm.tier||'T4',
+      quality:hasQ?profForm.quality:'Normal',
+      enchant:hasQ?(+profForm.enchant||0):0,
+      price:0,qty:1,note:profForm.note||'',
+      city:state.activeCity
+    };
+    await saveGuildListing(payload,!!profEditingId,profEditingId);
+    resetProfForm();render();
   });
   on('btn-gm-cancel','click',()=>{resetGuildForm();render();});
   on('btn-gm-save','click',async()=>{
@@ -934,20 +1155,40 @@ function bindGuildMarket(){
   qsa('[data-gm-edit]').forEach(el=>on(el,'click',()=>{
     const l=guildListings.find(x=>String(x.id)===String(el.dataset.gmEdit));
     if(!l||!isGuildOwner(l))return;
-    guildEditingId=l.id;
-    guildFormOpen=true;
-    guildForm={
-      order_type:l.order_type||'sell',
-      item_name:l.item_name||'',
-      unique_base_name:l.unique_base_name||'',
-      tier:l.tier||'T4',
-      quality:l.quality||'Excellent',
-      enchant:+l.enchant||0,
-      price:String(l.price||''),
-      qty:+l.qty||1,
-      note:l.note||'',
-      city:l.city||state.activeCity
-    };
+    if(isProfessionListing(l)){
+      resetGuildForm();
+      profEditingId=l.id;
+      profFormOpen=true;
+      guildMainTab='profession';
+      let pid='other',custom=(l.item_name||'').trim();
+      for(const o of PROFESSION_OPTS){
+        if(o.id==='other')continue;
+        if(custom===o.pl||custom===o.en){pid=o.id;custom='';break;}
+      }
+      profForm={
+        professionId:pid,customTitle:custom,
+        item_name:'',
+        unique_base_name:l.unique_base_name||'',
+        tier:l.tier||'T4',quality:l.quality||'Normal',enchant:+l.enchant||0,
+        note:l.note||''
+      };
+    }else{
+      resetProfForm();
+      guildEditingId=l.id;
+      guildFormOpen=true;
+      guildForm={
+        order_type:l.order_type||'sell',
+        item_name:l.item_name||'',
+        unique_base_name:l.unique_base_name||'',
+        tier:l.tier||'T4',
+        quality:l.quality||'Excellent',
+        enchant:+l.enchant||0,
+        price:String(l.price||''),
+        qty:+l.qty||1,
+        note:l.note||'',
+        city:l.city||state.activeCity
+      };
+    }
     render();
   }));
   qsa('[data-gm-delete]').forEach(el=>on(el,'click',async()=>{
@@ -977,6 +1218,20 @@ function bindGuildMarket(){
     guildForm.enchant=+encEl.value||0;
     render();
   });
+  const profKind=document.getElementById('prof-kind');
+  if(profKind)profKind.addEventListener('change',()=>{profForm.professionId=profKind.value;render();});
+  const profTier=document.getElementById('prof-tier');
+  if(profTier)profTier.addEventListener('change',()=>{
+    profForm.tier=profTier.value;
+    if(profForm.unique_base_name&&!itemHasQuality(profForm.unique_base_name,profForm.tier))profForm.enchant=0;
+    render();
+  });
+  const pSearch=document.getElementById('prof-item-search');
+  if(pSearch){
+    pSearch.addEventListener('input',()=>{profForm.item_name=pSearch.value;profForm.unique_base_name='';triggerGuildSearch(pSearch,'prof-sdd','prof-tier');});
+    pSearch.addEventListener('focus',()=>{if(pSearch.value.length>=2)triggerGuildSearch(pSearch,'prof-sdd','prof-tier');});
+    pSearch.addEventListener('blur',()=>setTimeout(()=>{const dd=document.getElementById('prof-sdd');if(dd)dd.style.display='none';},200));
+  }
 }
 
 // ══════════ TRANSLATION HELPERS ══════════
@@ -1067,10 +1322,17 @@ const fp = n=>(n==null||isNaN(n))?'—':(n>=0?'+':'')+Math.round(n).toLocaleStri
 const esc= s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 // ══════════ BUILD ══════════
+function buildGuildMainTabs(){
+  return`<div class="gm-main-tabs">
+    <button type="button" class="gm-mtab${guildMainTab==='market'?' active':''}" data-gm-main="market">${t('gm_tab_market')}</button>
+    <button type="button" class="gm-mtab${guildMainTab==='profession'?' active':''}" data-gm-main="profession">${t('gm_tab_profession')}</button>
+  </div>`;
+}
 function buildApp(){
+  const pane=guildMainTab==='profession'?buildProfessionTab():buildGuildMarketTab();
   document.getElementById('app').innerHTML=
-    '<div id="sticky-top">'+buildHeader()+'</div>'+
-    '<div id="tc"><div class="tab-pane active" style="display:block;padding:20px">'+buildGuildMarketTab()+'</div></div>';
+    '<div id="sticky-top">'+buildHeader()+buildGuildMainTabs()+'</div>'+
+    '<div id="tc"><div class="tab-pane active" style="display:block;padding:0">'+pane+'</div></div>';
 }
 
 function buildHeader(){
@@ -1081,10 +1343,9 @@ function buildHeader(){
       <div class="logo-sub">Albion Online</div>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <a href="https://albion-kalkulator.github.io/albion-kalkulator/albion_enchant_calc.html" style="font-size:.82rem;color:var(--muted);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:8px" target="_blank" rel="noopener noreferrer">⚗️ ${state.lang==='pl'?'Kalkulator':'Calculator'}</a>
       <div class="lang-toggle" style="margin:0">
-        <button type="button" class="lang-btn${state.lang==='pl'?' active':''}" data-lang="pl">🇵🇱</button>
-        <button type="button" class="lang-btn${state.lang==='en'?' active':''}" data-lang="en">🇬🇧</button>
+        <button type="button" class="lang-btn${state.lang==='pl'?' active':''}" data-lang="pl">Polski</button>
+        <button type="button" class="lang-btn${state.lang==='en'?' active':''}" data-lang="en">English</button>
       </div>
       <div id="nick-display" style="display:none;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.82rem;font-weight:600;color:var(--gold-l)">
         <button onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0 0 0 6px;border-left:1px solid var(--border);margin-left:4px" title="Wyloguj">✕</button>
