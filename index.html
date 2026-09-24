@@ -518,7 +518,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-13';
+const APP_VERSION = 'rynek-gildii-14';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -708,7 +708,7 @@ const GM_TAGS=[
   {id:'w_arcane',pl:'Broń magiczna',en:'Magic weapons',keys:['magia','arcane','fire','frost','nature','curse','kląt'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/(CURSED|FIRE|FROST|NATURE|ARCANE)/i.test(b)&&!/HOLY|SHAPESHIFT/i.test(b)&&!/^(HEAD_|ARMOR_|SHOES_)/.test(b)},
   {id:'cook',pl:'Gotowanie (jedzenie)',en:'Cooking (food)',keys:['gotow','kuchn','jedzen','food','meal'],match:b=>/FOOD|MEAL|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|AVALONIAN|BEAN|CABBAGE|WORM/i.test(b)&&!/POTION|POISON|SKILLBOOK/i.test(b)},
   {id:'potions',pl:'Potki / trucizny',en:'Potions / poisons',keys:['potka','potion','trucizn','poison'],match:b=>/POTION|POISON/i.test(b)},
-  {id:'hunting_loot',pl:'Polowanie (szczątki / trofea)',en:'Hunting (remains / trophies)',keys:['polow','tracking','szczątk','remains','trofea','wildlife'],match:b=>/TRACKING|TRACKINGITEM|WILDLIFE|HUNTING/i.test(b)&&!/SKILLBOOK|TOME_WEAPON/i.test(b)},
+  {id:'hunting_loot',pl:'Polowanie (szczątki / trofea)',en:'Hunting (remains / trophies)',keys:['polow','tracking','szczątk','remains','trofea','wildlife','alchemy_common'],match:b=>/TRACKING|TRACKINGITEM|WILDLIFE|HUNTING|ALCHEMY_COMMON|ALCHEMY_RARE/i.test(b)&&!/SKILLBOOK|TOME_WEAPON|ALCHEMY_EXTRACT/i.test(b)},
   {id:'tome_hunt',pl:'Tomki z polowania',en:'Hunting tomes',keys:['polow','hunt','tom pol'],match:b=>/SKILLBOOK|TOME/i.test(b)&&/HUNT|WILDLIFE|TRACKING|SKINNER|GAME|TRAPPER/i.test(b)},
   {id:'tomes',pl:'Tomki (skillbooki)',en:'Skill books (tomes)',keys:['tome','skillbook','tom'],match:b=>/SKILLBOOK|TOME_/i.test(b)},
   {id:'shields',pl:'Tarcze',en:'Shields',keys:['tarcza','shield'],match:b=>/SHIELD/.test(b)},
@@ -807,7 +807,7 @@ function isNonQualityMaterial(baseName){
   if(!baseName)return true;
   const b=baseName.toUpperCase();
   if(/^(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW)/.test(b))return true;
-  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|TRACKING|TRACKINGITEM|WILDLIFE/i.test(b)&&!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return true;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|TRACKING|TRACKINGITEM|WILDLIFE|ALCHEMY_COMMON|ALCHEMY_RARE/i.test(b)&&!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return true;
   if(!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_|BAG|CAPE)/.test(b)&&/(ORE|HIDE|FIBER|WOOD|ROCK|PLANK|METALBAR|STONEBLOCK)/i.test(b))return true;
   return false;
 }
@@ -816,8 +816,8 @@ function itemHasResourceEnchant(baseName){
   const b=normalizeItemBase(baseName,'T4');
   if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
   if(/^BAG|^CAPE/.test(b))return false;
-  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TRACKING|TRACKINGITEM|WILDLIFE/i.test(b))return false;
-  return /(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|STONEBLOCK|BLOCK|REFINED|CLOTH|LEATHER|FISHSAUCE|BLOODBROTH|ALCOHOL|ALCHEMY|EXTRACT|POWDER|RUNE|SOUL|RELIC)/i.test(b);
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TRACKING|TRACKINGITEM|WILDLIFE|ALCHEMY_COMMON|ALCHEMY_RARE|ALCHEMY_EXTRACT|FISHSAUCE|BLOODBROTH|ALCOHOL/i.test(b))return false;
+  return /(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|BLOCK|REFINED|CLOTH|LEATHER|POWDER|RUNE|SOUL|RELIC)/i.test(b);
 }
 function itemHasGearEnchant(baseName){
   if(!baseName)return false;
@@ -884,9 +884,32 @@ function listingDisplayName(l){
   }
   return (l.item_name_pl||names?.pl||names?.en||l.item_name||'').trim();
 }
+const GM_NOTE_TAG_RE=/^⌁([^⌁]{1,12})⌁/;
+function parseListingNote(note){
+  const raw=note||'';
+  const m=raw.match(GM_NOTE_TAG_RE);
+  if(!m)return{tag:'',body:raw};
+  return{tag:m[1].trim(),body:raw.slice(m[0].length)};
+}
+function encodeListingNote(tag,body){
+  const t=(tag||'').trim();
+  const b=(body||'').trim();
+  return t?`⌁${t}⌁${b}`:b;
+}
+function listingGuildTag(l){
+  if(!l)return'';
+  const col=(l.guild_tag||'').trim();
+  if(col)return col;
+  return parseListingNote(l.note).tag;
+}
+function listingNoteText(l){
+  if(!l)return'';
+  if((l.guild_tag||'').trim())return(l.note||'').trim();
+  return parseListingNote(l.note).body.trim();
+}
 function formatListingNick(l){
   const n=(l.nick||'?').trim();
-  const tag=(l.guild_tag||'').trim();
+  const tag=listingGuildTag(l);
   return tag?`${n} [${tag}]`:n;
 }
 function fmtGuildDate(iso){
@@ -946,7 +969,7 @@ function getFilteredGuildListings(){
     const nmPl=(l.item_name_pl||'').toLowerCase();
     return nm.includes(q)||legacy.includes(q)||nmEn.includes(q)||nmPl.includes(q)||
            (l.nick||'').toLowerCase().includes(q)||
-           (l.guild_tag||'').toLowerCase().includes(q)||
+           listingGuildTag(l).toLowerCase().includes(q)||
            (l.note||'').toLowerCase().includes(q)||
            (l.tier||'').toLowerCase().includes(q)||
            (gmCityLabel(l.city)||l.city||'').toLowerCase().includes(q);
@@ -1034,6 +1057,8 @@ async function saveGuildListing(payload,isUpdate,id){
   payload.nick=cloudNick;
   const gt=(cloudGuildTag||'').trim();
   if(gt)payload.guild_tag=gt;
+  const noteParsed=parseListingNote(payload.note||'');
+  payload.note=encodeListingNote(gt,noteParsed.body);
   payload.updated_at=new Date().toISOString();
   if(!isUpdate)payload.created_at=payload.updated_at;
   const optionalCloudFields=['guild_tag','item_name_pl','item_name_en'];
@@ -1184,7 +1209,7 @@ function buildGuildMarketTab(){
           <span class="gm-qty">× ${l.qty||1}</span>
         </div>
         <div class="gm-price">${f(l.price)}${state.lang==='pl'?' / szt.':' / pc.'}</div>
-        ${l.note?`<div class="gm-note-text">${esc(l.note)}</div>`:''}
+        ${listingNoteText(l)?`<div class="gm-note-text">${esc(listingNoteText(l))}</div>`:''}
         <div style="font-size:.75rem;color:var(--muted);margin-top:6px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
       </div>
       ${buildGuildNickCol(l,owner)}
@@ -1252,7 +1277,7 @@ function buildProfessionTab(){
       ${iconHtml}
       <div class="gm-body">
         <div class="gm-title">${esc(l.item_name||'—')}</div>
-        ${l.note?`<div class="gm-note-text" style="margin-top:8px">${esc(l.note)}</div>`:''}
+        ${listingNoteText(l)?`<div class="gm-note-text" style="margin-top:8px">${esc(listingNoteText(l))}</div>`:''}
         <div style="font-size:.75rem;color:var(--muted);margin-top:10px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
       </div>
       ${buildGuildNickCol(l,owner)}
@@ -1468,12 +1493,13 @@ function bindGuildMarket(){
         item_name:'',
         unique_base_name:l.unique_base_name||'',
         tier:l.tier||'T4',quality:l.quality||'Normal',enchant:+l.enchant||0,
-        note:l.note||''
+        note:listingNoteText(l)
       };
     }else{
       resetProfForm();
       guildEditingId=l.id;
       guildFormOpen=true;
+      const hasEnc=itemHasEnchant(l.unique_base_name);
       guildForm={
         order_type:l.order_type||'sell',
         item_name:listingDisplayName(l)||l.item_name||'',
@@ -1482,10 +1508,10 @@ function bindGuildMarket(){
         unique_base_name:l.unique_base_name||'',
         tier:l.tier||'T4',
         quality:l.quality||'Excellent',
-        enchant:+l.enchant||0,
+        enchant:hasEnc?Math.min(guildMaxEnchantLevel(l.unique_base_name),Math.max(0,+l.enchant||0)):0,
         price:String(l.price||''),
         qty:+l.qty||1,
-        note:l.note||'',
+        note:listingNoteText(l),
         city:l.city==='HO'?'ANY':(l.city||state.activeCity)
       };
     }
@@ -2510,12 +2536,16 @@ async function syncListingsProfile(oldNick,newNick,newTag){
   else patch.guild_tag=null;
   const mine=guildListings.filter(l=>(l.nick||'').toLowerCase()===oldL);
   for(const l of mine){
-    Object.assign(l,patch);
+    const noteBody=listingNoteText(l);
+    l.nick=patch.nick;
+    if(newTag)l.guild_tag=newTag; else delete l.guild_tag;
+    l.note=encodeListingNote(newTag,noteBody);
     try{
-      let body={...patch,updated_at:new Date().toISOString()};
+      let body={nick:patch.nick,note:l.note,updated_at:new Date().toISOString()};
+      if(newTag)body.guild_tag=newTag;
       let r=await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
       if(!r.ok&&body.guild_tag!=null){
-        body={nick:patch.nick,updated_at:body.updated_at};
+        body={nick:patch.nick,note:l.note,updated_at:body.updated_at};
         await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
       }
     }catch(_){}
