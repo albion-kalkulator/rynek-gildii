@@ -405,6 +405,11 @@ pl:{
   gm_prof_form_add:'Nowe ogłoszenie', gm_prof_form_edit:'Edycja ogłoszenia',
   gm_prof_no_title:'Wpisz tytuł ogłoszenia.',
   gm_prof_toolbar:'Ogłoszenia gildii — oferty, prośby, informacje',
+  gm_profile_edit:'Edytuj profil',
+  gm_profile_title:'Profil',
+  gm_profile_save:'Zapisz profil',
+  gm_profile_updated:'Profil zaktualizowany.',
+  gm_profile_nick_required:'Podaj nick.',
 },
 en:{
   tab_items:'⚔️ Items', tab_mats:'🔷 Materials', tab_settings:'⚙️ Settings',
@@ -491,6 +496,11 @@ en:{
   gm_prof_form_add:'New announcement', gm_prof_form_edit:'Edit announcement',
   gm_prof_no_title:'Enter an announcement title.',
   gm_prof_toolbar:'Guild announcements — offers, requests, info',
+  gm_profile_edit:'Edit profile',
+  gm_profile_title:'Profile',
+  gm_profile_save:'Save profile',
+  gm_profile_updated:'Profile updated.',
+  gm_profile_nick_required:'Enter a nick.',
 }};
 
 // ══════════ CONSTANTS ══════════
@@ -508,7 +518,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-12';
+const APP_VERSION = 'rynek-gildii-13';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -527,8 +537,9 @@ const QUALITY_CLASS = {
   Excellent:'gm-q-excellent', Masterpiece:'gm-q-masterpiece'
 };
 const TIERS = ['T4','T5','T6','T7','T8'];
-// Tier colors: T4=blue, T5=red, T6=orange, T7=yellow, T8=white
-const TIER_C = {T4:'#4488ff',T5:'#ff3333',T6:'#ff8820',T7:'#ffdd00',T8:'#e8e8e8'};
+const GM_TIERS = ['T1','T2','T3','T4','T5','T6','T7','T8'];
+// Tier colors: T1–T3 low tiers, T4=blue … T8=white
+const TIER_C = {T1:'#b0b0b0',T2:'#55bb55',T3:'#55aadd',T4:'#4488ff',T5:'#ff3333',T6:'#ff8820',T7:'#ffdd00',T8:'#e8e8e8'};
 const TIER_PFX    = {T4:"Adept's",   T5:"Expert's",   T6:"Master's",    T7:"Grandmaster's", T8:"Elder's"};
 const TIER_PFX_PL = {T4:'Adepta',    T5:'Eksperta',   T6:'Mistrza',     T7:'Arcymistrza',   T8:'Starszego'};
 const MAT_TYPES = ['rune','soul','relic'];
@@ -697,6 +708,7 @@ const GM_TAGS=[
   {id:'w_arcane',pl:'Broń magiczna',en:'Magic weapons',keys:['magia','arcane','fire','frost','nature','curse','kląt'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/(CURSED|FIRE|FROST|NATURE|ARCANE)/i.test(b)&&!/HOLY|SHAPESHIFT/i.test(b)&&!/^(HEAD_|ARMOR_|SHOES_)/.test(b)},
   {id:'cook',pl:'Gotowanie (jedzenie)',en:'Cooking (food)',keys:['gotow','kuchn','jedzen','food','meal'],match:b=>/FOOD|MEAL|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|AVALONIAN|BEAN|CABBAGE|WORM/i.test(b)&&!/POTION|POISON|SKILLBOOK/i.test(b)},
   {id:'potions',pl:'Potki / trucizny',en:'Potions / poisons',keys:['potka','potion','trucizn','poison'],match:b=>/POTION|POISON/i.test(b)},
+  {id:'hunting_loot',pl:'Polowanie (szczątki / trofea)',en:'Hunting (remains / trophies)',keys:['polow','tracking','szczątk','remains','trofea','wildlife'],match:b=>/TRACKING|TRACKINGITEM|WILDLIFE|HUNTING/i.test(b)&&!/SKILLBOOK|TOME_WEAPON/i.test(b)},
   {id:'tome_hunt',pl:'Tomki z polowania',en:'Hunting tomes',keys:['polow','hunt','tom pol'],match:b=>/SKILLBOOK|TOME/i.test(b)&&/HUNT|WILDLIFE|TRACKING|SKINNER|GAME|TRAPPER/i.test(b)},
   {id:'tomes',pl:'Tomki (skillbooki)',en:'Skill books (tomes)',keys:['tome','skillbook','tom'],match:b=>/SKILLBOOK|TOME_/i.test(b)},
   {id:'shields',pl:'Tarcze',en:'Shields',keys:['tarcza','shield'],match:b=>/SHIELD/.test(b)},
@@ -795,7 +807,7 @@ function isNonQualityMaterial(baseName){
   if(!baseName)return true;
   const b=baseName.toUpperCase();
   if(/^(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW)/.test(b))return true;
-  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED/i.test(b)&&!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return true;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|TRACKING|TRACKINGITEM|WILDLIFE/i.test(b)&&!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return true;
   if(!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_|BAG|CAPE)/.test(b)&&/(ORE|HIDE|FIBER|WOOD|ROCK|PLANK|METALBAR|STONEBLOCK)/i.test(b))return true;
   return false;
 }
@@ -804,7 +816,7 @@ function itemHasResourceEnchant(baseName){
   const b=normalizeItemBase(baseName,'T4');
   if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
   if(/^BAG|^CAPE/.test(b))return false;
-  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING/i.test(b))return false;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TRACKING|TRACKINGITEM|WILDLIFE/i.test(b))return false;
   return /(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|STONEBLOCK|BLOCK|REFINED|CLOTH|LEATHER|FISHSAUCE|BLOODBROTH|ALCOHOL|ALCHEMY|EXTRACT|POWDER|RUNE|SOUL|RELIC)/i.test(b);
 }
 function itemHasGearEnchant(baseName){
@@ -1108,7 +1120,7 @@ function buildGuildMarketTab(){
     <div class="gm-form-grid">
       <div class="fg"><div class="fl">${t('lbl_tier')}</div>
         <select class="fi" id="gm-tier">
-          ${TIERS.map(tr=>`<option value="${tr}"${tr===gf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+          ${GM_TIERS.map(tr=>`<option value="${tr}"${tr===gf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
         </select>
       </div>
       ${hasGearQ?`<div class="fg"><div class="fl">${t('lbl_quality')}</div>
@@ -1208,7 +1220,7 @@ function buildProfessionTab(){
     <div class="gm-form-grid" style="margin-bottom:10px">
       <div class="fg"><div class="fl">${t('lbl_tier')}</div>
         <select class="fi" id="prof-tier">
-          ${TIERS.map(tr=>`<option value="${tr}"${tr===pf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+          ${GM_TIERS.map(tr=>`<option value="${tr}"${tr===pf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
         </select>
       </div>
     </div>
@@ -1271,7 +1283,7 @@ async function triggerGuildSearch(inp,ddId='gm-sdd',tierId='gm-tier'){
     if(!db||!Object.keys(db).length){dd.innerHTML=`<div class="sdd-msg">${t('search_err')}</div>`;return;}
     const q=query.toLowerCase(),hits=[];
     for(const [uname,names] of Object.entries(db)){
-      const tm=uname.match(/^T([4-8])_/);
+      const tm=uname.match(/^T([1-8])_/);
       if(!tm)continue;
       const en=(names.en||'').toLowerCase(),pl=(names.pl||'').toLowerCase();
       if(!en.includes(q)&&!pl.includes(q))continue;
@@ -1634,7 +1646,8 @@ function buildHeader(){
         <button type="button" class="lang-btn${state.lang==='en'?' active':''}" data-lang="en">English</button>
       </div>
       <div id="nick-display" style="display:none;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.82rem;font-weight:600;color:var(--gold-l)">
-        <button onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0 0 0 6px;border-left:1px solid var(--border);margin-left:4px" title="Wyloguj">✕</button>
+        <button type="button" id="btn-profile-edit" style="background:none;border:none;color:var(--gold-l);cursor:pointer;font-size:.78rem;padding:0 4px" title="${esc(t('gm_profile_edit'))}">✏️</button>
+        <button type="button" onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0 0 0 6px;border-left:1px solid var(--border);margin-left:4px" title="Wyloguj">✕</button>
       </div>
     </div>
   </div>`;
@@ -2343,6 +2356,7 @@ function bind(){
   qsa('[data-lang]').forEach(el=>el.addEventListener('click',()=>{
     if(state.lang!==el.dataset.lang){state.lang=el.dataset.lang;render();}
   }));
+  on('btn-profile-edit','click',()=>openProfileModal());
   bindGuildMarket();
 }
 
@@ -2479,17 +2493,97 @@ function buildLoginModal(){
   </div>`;
 }
 
-async function doLogin(nick,guildTag){
-  nick=nick.trim();
-  if(!nick)return;
-  const btn=document.getElementById('nick-confirm');
-  if(btn)btn.disabled=true;
+function persistProfile(nick,guildTag){
+  nick=(nick||'').trim();
   guildTag=(guildTag||'').trim();
   localStorage.setItem('ao_nick',nick);
   cloudNick=nick;
   cloudGuildTag=guildTag;
   if(guildTag)localStorage.setItem('ao_guild_tag',guildTag);
   else localStorage.removeItem('ao_guild_tag');
+}
+async function syncListingsProfile(oldNick,newNick,newTag){
+  const oldL=(oldNick||'').trim().toLowerCase();
+  if(!oldL)return;
+  const patch={nick:newNick.trim()};
+  if(newTag)patch.guild_tag=newTag;
+  else patch.guild_tag=null;
+  const mine=guildListings.filter(l=>(l.nick||'').toLowerCase()===oldL);
+  for(const l of mine){
+    Object.assign(l,patch);
+    try{
+      let body={...patch,updated_at:new Date().toISOString()};
+      let r=await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
+      if(!r.ok&&body.guild_tag!=null){
+        body={nick:patch.nick,updated_at:body.updated_at};
+        await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
+      }
+    }catch(_){}
+  }
+  localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
+  try{await loadGuildMarket();}catch(_){}
+}
+function buildProfileModal(){
+  return`<div id="profile-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(6px)">
+    <div style="background:var(--s1);border:2px solid var(--gold-d);border-radius:18px;padding:32px 28px;width:92%;max-width:400px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8)">
+      <div style="font-size:1.1rem;font-weight:700;color:var(--gold-l);margin-bottom:18px">${t('gm_profile_title')}</div>
+      <div style="font-size:.75rem;color:var(--muted);text-align:left;margin-bottom:4px">${state.lang==='pl'?'Nick':'Nick'}</div>
+      <input id="profile-nick-input" type="text" value="${esc(cloudNick||'')}" autocomplete="off" spellcheck="false"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:1rem;text-align:center;margin-bottom:10px;outline:none">
+      <div style="font-size:.75rem;color:var(--muted);text-align:left;margin-bottom:4px">${t('gm_guild_tag')}</div>
+      <input id="profile-tag-input" type="text" value="${esc(cloudGuildTag||'')}" placeholder="${esc(t('gm_guild_tag_ph'))}" autocomplete="off" spellcheck="false" maxlength="12"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:10px 16px;font-size:.95rem;text-align:center;margin-bottom:8px;outline:none;text-transform:uppercase">
+      <div id="profile-status" style="font-size:.8rem;color:var(--muted);min-height:20px;margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="profile-save" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--gold-d),#8a6a25);border:none;border-radius:10px;color:var(--gold-l);font-size:.95rem;font-weight:700;cursor:pointer">${t('gm_profile_save')}</button>
+        <button id="profile-cancel" class="btn-rm" style="flex:1;padding:12px;border-radius:10px">${t('gm_cancel')}</button>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:12px;text-align:left">${state.lang==='pl'?'Zmiana nicku zaktualizuje też Twoje ogłoszenia na liście (w tej przeglądarce i w bazie, jeśli połączenie działa).':'Changing your nick also updates your listings here and in the database when online.'}</div>
+    </div>
+  </div>`;
+}
+function closeProfileModal(){
+  const ov=document.getElementById('profile-overlay');
+  if(ov)ov.remove();
+}
+function bindProfileModal(){
+  const inp=document.getElementById('profile-nick-input');
+  const tag=document.getElementById('profile-tag-input');
+  const save=document.getElementById('profile-save');
+  const cancel=document.getElementById('profile-cancel');
+  const status=document.getElementById('profile-status');
+  if(inp)inp.focus();
+  if(cancel)cancel.addEventListener('click',closeProfileModal);
+  const runSave=async()=>{
+    const newNick=(inp?inp.value:'').trim();
+    const newTag=(tag?tag.value:'').trim();
+    if(!newNick){
+      if(status){status.style.color='var(--red)';status.textContent=t('gm_profile_nick_required');}
+      return;
+    }
+    const oldNick=cloudNick;
+    if(save)save.disabled=true;
+    persistProfile(newNick,newTag);
+    await syncListingsProfile(oldNick,newNick,newTag);
+    closeProfileModal();
+    guildStatus=t('gm_profile_updated');
+    render();
+    updateNickDisplay();
+  };
+  if(save)save.addEventListener('click',runSave);
+  if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter')runSave();});
+}
+function openProfileModal(){
+  closeProfileModal();
+  document.body.insertAdjacentHTML('beforeend',buildProfileModal());
+  bindProfileModal();
+}
+async function doLogin(nick,guildTag){
+  nick=nick.trim();
+  if(!nick)return;
+  const btn=document.getElementById('nick-confirm');
+  if(btn)btn.disabled=true;
+  persistProfile(nick,guildTag);
   const ov=document.getElementById('login-overlay');
   if(ov)ov.remove();
   await loadGuildMarket();
