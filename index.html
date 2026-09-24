@@ -536,7 +536,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-19';
+const APP_VERSION = 'rynek-gildii-20';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -919,21 +919,18 @@ function parseListingNote(note){
   if(!m)return{tag:'',body:raw};
   return{tag:m[1].trim(),body:raw.slice(m[0].length)};
 }
-function encodeListingNote(tag,body){
-  const t=(tag||'').trim();
-  const b=(body||'').trim();
-  return t?`⌁${t}⌁${b}`:b;
-}
 function listingGuildTag(l){
   if(!l)return'';
   const col=(l.guild_tag||'').trim();
   if(col)return col;
   return parseListingNote(l.note).tag;
 }
+function noteBodyForForm(note){
+  return parseListingNote(note||'').body.trim();
+}
 function listingNoteText(l){
   if(!l)return'';
-  if((l.guild_tag||'').trim())return(l.note||'').trim();
-  return parseListingNote(l.note).body.trim();
+  return noteBodyForForm(l.note);
 }
 function formatListingNick(l){
   const n=(l.nick||'?').trim();
@@ -1277,8 +1274,7 @@ async function saveGuildListing(payload,isUpdate,id){
   payload.nick=cloudNick;
   const gt=(cloudGuildTag||'').trim();
   if(gt)payload.guild_tag=gt;
-  const noteParsed=parseListingNote(payload.note||'');
-  payload.note=encodeListingNote(gt,noteParsed.body);
+  payload.note=noteBodyForForm(payload.note||'');
   payload.updated_at=new Date().toISOString();
   if(!isUpdate){
     payload.created_at=payload.updated_at;
@@ -1405,7 +1401,7 @@ function buildGuildMarketTab(){
       </div>
     </div>
     <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_note')}</div>
-      <input type="text" class="fi" id="gm-note" style="width:100%;max-width:520px" value="${esc(gf.note)}" placeholder="">
+      <input type="text" class="fi" id="gm-note" style="width:100%;max-width:520px" value="${esc(noteBodyForForm(gf.note))}" placeholder="">
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-add" id="btn-gm-save">${t('gm_save')}</button>
@@ -1497,7 +1493,7 @@ function buildProfessionTab(){
       ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}</div>`:''}
     </div>
     <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_prof_note')}</div>
-      <textarea class="fi" id="prof-note" rows="4" style="width:100%;max-width:520px;resize:vertical">${esc(pf.note)}</textarea>
+      <textarea class="fi" id="prof-note" rows="4" style="width:100%;max-width:520px;resize:vertical">${esc(noteBodyForForm(pf.note))}</textarea>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-add" id="btn-prof-save">${t('gm_save')}</button>
@@ -1611,7 +1607,7 @@ function readGuildFormFromDom(){
   if(en)guildForm.enchant=+en.value||0;
   if(pr)guildForm.price=pr.value;
   if(qt)guildForm.qty=parseInt(qt.value)||1;
-  if(no)guildForm.note=no.value;
+  if(no)guildForm.note=noteBodyForForm(no.value);
   if(si&&!guildForm.unique_base_name)guildForm.item_name=si.value;
 }
 function bindGuildMarket(){
@@ -1674,7 +1670,7 @@ function bindGuildMarket(){
     const noteEl=document.getElementById('prof-note');
     const tierEl=document.getElementById('prof-tier');
     if(titleEl)profForm.title=titleEl.value;
-    if(noteEl)profForm.note=noteEl.value;
+    if(noteEl)profForm.note=noteBodyForForm(noteEl.value);
     if(tierEl)profForm.tier=tierEl.value;
     const title=profDisplayTitle(profForm);
     if(!title){guildStatus=t('gm_prof_no_title');render();return;}
@@ -2778,7 +2774,7 @@ async function syncListingsProfile(oldNick,newNick,newTag){
     const noteBody=listingNoteText(l);
     l.nick=patch.nick;
     if(newTag)l.guild_tag=newTag; else delete l.guild_tag;
-    l.note=encodeListingNote(newTag,noteBody);
+    l.note=noteBody;
     try{
       let body={nick:patch.nick,note:l.note,updated_at:new Date().toISOString()};
       if(newTag)body.guild_tag=newTag;
