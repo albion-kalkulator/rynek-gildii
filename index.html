@@ -1,0 +1,3009 @@
+<!DOCTYPE html>
+<!-- build: rynek-gildii-11 -->
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Rynek gildii – Albion Online</title>
+<style>
+:root{
+  --bg:#08081a;--s1:#10102a;--s2:#181838;--s3:#202048;
+  --border:#2e2e60;--gold:#c9a84c;--gold-l:#e8c96a;--gold-d:#7a5f20;
+  --text:#e0d5c0;--muted:#8080b0;--green:#4caf50;--gbg:rgba(76,175,80,.10);
+  --red:#f44336;--rbg:rgba(244,67,54,.10);--blue:#5599ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+
+/* HEADER */
+#hdr{background:linear-gradient(180deg,#200f00,#0e0600);border-bottom:2px solid var(--gold-d);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:relative;z-index:10}
+.logo-i{font-size:2rem}
+.logo-main{font-size:1rem;font-weight:700;color:var(--gold-l);letter-spacing:1px;text-transform:uppercase}
+.logo-sub{font-size:.7rem;color:var(--muted)}
+/* Main app sections (calc / guild) */
+.main-nav{display:flex;align-items:stretch;background:var(--s1);border:2px solid var(--border);border-radius:12px;padding:5px;gap:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.main-nav-sep{width:2px;background:linear-gradient(180deg,transparent,var(--border),transparent);margin:6px 4px;flex-shrink:0;border-radius:1px}
+.main-tab{display:flex;align-items:center;gap:9px;padding:10px 20px;border-radius:9px;border:2px solid transparent;background:transparent;color:var(--muted);font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;user-select:none;letter-spacing:.2px;white-space:nowrap;line-height:1.2}
+.main-tab-ico{font-size:1.35rem;line-height:1;flex-shrink:0}
+.main-tab-lbl{font-size:.88rem}
+.main-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+.main-tab.active{color:var(--gold-l);border-color:var(--gold-d);background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.06));box-shadow:0 0 16px rgba(201,168,76,.18),inset 0 1px 0 rgba(255,255,255,.08)}
+.main-tab.active .main-tab-ico{filter:drop-shadow(0 0 6px rgba(201,168,76,.45))}
+.main-tab-badge{display:inline-block;background:var(--gold);color:#000;border-radius:999px;padding:1px 7px;font-size:.65rem;font-weight:800;margin-left:2px;vertical-align:middle}
+.prem-btn{display:flex;align-items:center;gap:9px;padding:8px 16px;background:var(--s2);border:2px solid var(--border);border-radius:9px;cursor:pointer;transition:all .2s;user-select:none;color:var(--muted)}
+.prem-btn:hover{border-color:var(--gold-d);color:var(--text)}
+.prem-btn.on{background:linear-gradient(135deg,#3d2500,#4f3200);border-color:var(--gold);color:var(--gold-l);box-shadow:0 0 20px rgba(201,168,76,.25)}
+.prem-btn img{height:24px;border-radius:4px;object-fit:cover}
+.prem-btn .lbl{font-weight:700;font-size:.9rem}
+/* City */
+.city-wrap{position:relative}
+.city-btn{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--s2);border:2px solid var(--border);border-radius:9px;cursor:pointer;transition:all .2s;user-select:none}
+.city-btn:hover,.city-btn.open{border-color:var(--gold-d)}
+.city-btn .c-icon{font-size:1.6rem;line-height:1}
+.city-btn .c-name{font-size:.9rem;font-weight:600}
+.city-btn .c-arr{font-size:.7rem;color:var(--muted);margin-left:4px;transition:transform .2s}
+.city-btn.open .c-arr{transform:rotate(180deg)}
+#city-panel{position:fixed;top:auto;left:50%;transform:translateX(-50%);background:var(--s1);border:2px solid var(--border);border-radius:14px;padding:16px;z-index:200;width:min(580px,96vw);box-shadow:0 12px 40px rgba(0,0,0,.7);display:none}
+#city-panel.open{display:block}
+.city-panel-ttl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.city-panel-ttl img{height:20px;filter:drop-shadow(0 0 4px rgba(201,168,76,.5))}
+.city-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.city-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;background:var(--s2);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;user-select:none}
+.city-tile:hover{border-color:var(--gold-d);background:var(--s3)}
+.city-tile.active{background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-color:var(--gold)}
+.ct-icon{font-size:2.6rem;line-height:1}
+.ct-name{font-size:.8rem;font-weight:700;text-align:center;white-space:nowrap}
+.ct-count{font-size:.68rem;color:var(--muted)}
+
+/* TABS */
+#tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto}
+#sticky-top{position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.6)}
+.tab-btn{padding:12px 20px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:.88rem;white-space:nowrap;transition:all .2s;user-select:none}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-pane{display:none;padding:20px}
+.tab-pane.active{display:block}
+.sec-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px}
+.city-ctx{display:inline-flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;margin-bottom:16px;font-size:.82rem;color:var(--muted)}
+
+/* MATERIALS */
+.mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mat-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px}
+.mat-card-ttl{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.mat-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,.025);border-radius:8px}
+.mat-row:last-child{margin-bottom:0}
+.mat-img{width:52px;height:52px;object-fit:contain;border-radius:7px;flex-shrink:0}
+.mat-name{flex:1;font-size:.92rem;line-height:1.4}
+.mat-inp{width:130px;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:9px 11px;font-size:.95rem;text-align:right;flex-shrink:0}
+.mat-inp:focus{outline:none;border-color:var(--gold)}
+
+/* SETTINGS */
+.scard{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;max-width:460px;margin-bottom:14px}
+.scard-ttl{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:14px}
+.s-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.s-row:last-child{margin-bottom:0}
+.s-row label{flex:1;font-size:.88rem;color:var(--muted)}
+.s-row input{width:80px;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 9px;font-size:.88rem;text-align:right}
+.s-row input:focus{outline:none;border-color:var(--gold)}
+.s-row .unit{font-size:.8rem;color:var(--muted);width:16px}
+.hint{font-size:.75rem;color:var(--muted);margin-top:10px;line-height:1.6}
+/* Language toggle */
+.lang-toggle{display:flex;gap:8px;margin-bottom:14px}
+.lang-btn{padding:10px 22px;border-radius:9px;border:2px solid var(--border);background:var(--s2);color:var(--muted);font-size:.92rem;font-weight:600;cursor:pointer;transition:all .2s;user-select:none}
+.lang-btn:hover{border-color:var(--gold-d);color:var(--text)}
+.lang-btn.active{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+
+/* ITEM CARDS */
+.items-list{display:flex;flex-direction:column;gap:16px}
+.sort-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--s1);border:1px solid var(--border);border-radius:10px}
+.sort-lbl{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-right:4px;white-space:nowrap}
+.sort-btn{display:flex;align-items:center;gap:5px;padding:6px 13px;background:var(--s2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
+.sort-btn:hover{border-color:var(--gold-d);color:var(--text)}
+.sort-btn.active{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+.fav-btn{background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:6px 11px;cursor:pointer;font-size:1.15rem;color:var(--muted);transition:all .2s;line-height:1;flex-shrink:0}
+.fav-btn:hover{border-color:var(--gold-d);color:var(--gold-l)}
+.fav-btn.on{color:#ffd700;border-color:rgba(255,215,0,.55);background:rgba(255,215,0,.1);text-shadow:0 0 8px rgba(255,215,0,.45)}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:9px;padding:16px;background:var(--s1);border:2px dashed var(--border);border-radius:12px;cursor:pointer;color:var(--muted);font-size:.95rem;transition:all .2s;user-select:none}
+.add-btn:hover{border-color:var(--gold-d);color:var(--gold)}
+.item-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.item-top{background:var(--s2);padding:14px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.item-icon{width:90px;height:90px;background:var(--bg);border:2px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;overflow:hidden;flex-shrink:0;position:relative}
+.item-icon img{width:100%;height:100%;object-fit:contain}
+.item-fields{display:flex;align-items:flex-start;gap:9px;flex-wrap:wrap;flex:1}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.fi{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 10px;font-size:.85rem}
+.fi:focus{outline:none;border-color:var(--gold)}
+select.fi option{background:var(--s2)}
+.item-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto;align-self:flex-start;padding-top:4px}
+/* Big sell order button */
+.so-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--s2);border:2px solid var(--border);border-radius:9px;color:var(--muted);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
+.so-btn:hover{border-color:var(--gold-d);color:var(--text)}
+.so-btn.on{background:linear-gradient(135deg,rgba(76,175,80,.18),rgba(76,175,80,.06));border-color:var(--green);color:var(--green);box-shadow:0 0 14px rgba(76,175,80,.22)}
+.so-btn input{display:none}
+.btn-rm{background:none;border:1px solid rgba(244,67,54,.35);color:var(--red);border-radius:7px;padding:6px 12px;cursor:pointer;font-size:.82rem;transition:all .2s}
+.btn-rm:hover{background:rgba(244,67,54,.18)}
+
+/* ITEM BODY */
+.item-body{padding:14px 16px}
+.range-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.range-lbl{font-size:.85rem;color:var(--muted);font-weight:600}
+.rsel{background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px 12px;font-size:.88rem;cursor:pointer;font-weight:600}
+.rsel:focus{outline:none;border-color:var(--gold)}
+.rsel option{background:var(--s2)}
+.arr-big{color:var(--gold);font-size:1.3rem;font-weight:700}
+.range-info{font-size:.82rem;font-weight:700;border-radius:6px;padding:4px 10px;border:1px solid}
+.prices-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end}
+.pg2{display:flex;flex-direction:column;gap:4px;flex:1;min-width:88px}
+.pg2 .pl{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:4px;font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}
+.d0{background:#777}.d1{background:#3dbf40}.d2{background:#4488ff}.d3{background:#aa44ff}
+.pin{background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 9px;font-size:.88rem;width:100%;text-align:right}
+.pin:focus{outline:none;border-color:var(--gold)}
+
+/* RESULTS TABLE */
+.tbl-wrap{overflow-x:auto;margin-bottom:16px}
+.rtbl{width:100%;border-collapse:collapse;font-size:14px;min-width:880px}
+.rtbl th{background:rgba(0,0,0,.45);color:var(--muted);padding:10px 11px;text-align:left;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap}
+.rtbl td{padding:10px 11px;border-bottom:1px solid rgba(46,46,96,.5);vertical-align:middle}
+.rtbl tr:last-child td{border-bottom:none}
+.rtbl tr.rg{background:var(--gbg)}
+.rtbl tr.rb{background:var(--rbg)}
+.rtbl tr.rdim{opacity:.4}
+.pg{color:var(--green);font-weight:700}
+.pb{color:var(--red);font-weight:700}
+.pn{color:var(--muted);font-style:italic}
+.step-l{font-weight:700;white-space:nowrap;font-size:.88rem}
+.mat-cell{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.mat-cell img{width:32px;height:32px;object-fit:contain;border-radius:5px;background:rgba(255,255,255,.04)}
+.mat-cell .mq{color:var(--gold);font-weight:700}
+.verdict{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.vy{background:rgba(76,175,80,.2);color:var(--green);border:1px solid rgba(76,175,80,.4)}
+.vn{background:rgba(244,67,54,.2);color:var(--red);border:1px solid rgba(244,67,54,.4)}
+.vna{background:var(--s3);color:var(--muted);border:1px solid var(--border)}
+.rdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:5px;vertical-align:middle}
+
+/* REQUIRED MATERIALS PILLS (in item card) */
+.req-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:9px}
+.req-lbl{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);white-space:nowrap;margin-right:4px}
+.req-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px}
+.req-pill img{width:26px;height:26px;object-fit:contain}
+.req-pill .rp-qty{font-weight:700;color:var(--gold-l);font-size:.92rem}
+.req-pill .rp-name{font-size:.82rem;color:var(--muted)}
+/* SUMMARY */
+.sum-card{background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(201,168,76,.02));border:1.5px solid rgba(201,168,76,.25);border-radius:12px;padding:18px}
+.sum-head{font-size:.88rem;font-weight:700;color:var(--gold-l);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sum-badge{font-size:.72rem;color:var(--muted);background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:3px 8px}
+.sum-lines{display:flex;flex-direction:column;gap:8px}
+.sum-line{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:7px}
+.sum-line-lbl{flex:1;font-size:.88rem;color:var(--muted)}
+.sum-line-val{font-size:.95rem;font-weight:700;white-space:nowrap}
+.sum-sep{height:1px;background:rgba(201,168,76,.15);margin:4px 0}
+.sum-invest{background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.2);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:4px}
+.sum-profit-box{border-radius:9px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.sum-profit-box.good{background:rgba(76,175,80,.1);border:1.5px solid rgba(76,175,80,.35)}
+.sum-profit-box.bad{background:rgba(244,67,54,.1);border:1.5px solid rgba(244,67,54,.35)}
+.sum-profit-big{font-size:1.3rem;font-weight:700}
+.sum-daily{font-size:.82rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+.sum-na{color:var(--muted);font-style:italic;font-size:.85rem}
+
+/* BACK TO TOP */
+#btn-top,#btn-bot{position:fixed;right:24px;width:46px;height:46px;background:linear-gradient(135deg,var(--s2),var(--s3));border:2px solid var(--gold-d);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:500;font-size:1.1rem;color:var(--gold);box-shadow:0 4px 16px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s,border-color .2s}
+#btn-top{bottom:78px}
+#btn-bot{bottom:24px}
+#btn-top.vis,#btn-bot.vis{opacity:1;pointer-events:auto}
+#btn-top:hover,#btn-bot:hover{border-color:var(--gold)}
+#btn-top:hover{transform:scale(1.1) translateY(-2px)}
+#btn-bot:hover{transform:scale(1.1) translateY(2px)}
+@media(max-width:1200px){.mat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.mat-grid{grid-template-columns:1fr}}
+/* SEARCH AUTOCOMPLETE */
+.search-wrap{position:relative;display:inline-block}
+.search-dd{position:absolute;top:100%;left:0;min-width:280px;background:var(--s1);border:1.5px solid var(--border);border-radius:9px;z-index:300;max-height:280px;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.8)}
+.sdd-item{padding:7px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid rgba(46,46,96,.5);transition:background .12s}
+.sdd-item:last-child{border-bottom:none}
+.sdd-item:hover,.sdd-item.focus{background:var(--s2)}
+.sdd-item img{width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0}
+.sdd-name{font-size:.86rem;color:var(--text)}
+.sdd-msg{padding:12px;text-align:center;color:var(--muted);font-size:.82rem}
+/* ADD-TO-SUMMARY / MARKET BUTTONS */
+.sum-act-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-add-sum{padding:7px 15px;border-radius:8px;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-add-sum:hover{border-color:var(--gold-d);color:var(--text)}
+.btn-add-sum.on{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+.btn-to-market{padding:7px 15px;border-radius:8px;border:1.5px solid rgba(76,175,80,.45);background:rgba(76,175,80,.08);color:#4caf50;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-to-market:hover{background:rgba(76,175,80,.18)}
+/* SUMMARY TAB */
+.stab-total{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1.5px solid rgba(201,168,76,.25);border-radius:12px;padding:16px;margin-bottom:14px;display:flex;gap:12px;flex-wrap:wrap}
+.stab-kv{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:160px}
+.stab-k{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.stab-v{font-size:1rem;font-weight:700}
+.stab-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.stab-card-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:nowrap}
+.stab-card-main{flex:1;min-width:0}
+.stab-card-icon{flex-shrink:0;order:-1}
+.stab-card-icon img{width:120px;height:120px;object-fit:contain;border-radius:12px;background:rgba(0,0,0,.35);padding:8px;display:block}
+.stab-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.stab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+/* AWAITING TAB */
+.await-card{background:var(--s1);border:1.5px solid rgba(76,175,80,.2);border-radius:10px;padding:14px;margin-bottom:10px}
+.await-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.await-info{flex:1;min-width:0}
+.await-name{font-weight:700;font-size:.95rem}
+.await-sub{font-size:.75rem;color:var(--muted);margin-top:2px}
+.await-nums{display:flex;flex-direction:column;align-items:flex-end;gap:3px;white-space:nowrap}
+.btn-sold{padding:8px 18px;border-radius:8px;border:1.5px solid rgba(76,175,80,.5);background:rgba(76,175,80,.1);color:#4caf50;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-sold:hover{background:rgba(76,175,80,.25)}
+/* STATS BOX */
+.stats-box{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.stats-head{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stats-kv{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.stats-k{font-size:.68rem;color:var(--muted);margin-bottom:3px}
+.stats-v{font-size:1rem;font-weight:700;color:var(--gold-l)}
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+/* TEST BADGE */
+.test-badge{display:inline-block;background:#ff5722;color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle;letter-spacing:.5px}
+/* GUILD MARKET */
+.gm-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;padding:12px 14px;background:var(--s1);border:1px solid var(--border);border-radius:10px}
+.gm-filters{display:flex;gap:6px;flex-wrap:wrap}
+.gm-fbtn{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.gm-fbtn:hover{border-color:var(--gold-d);color:var(--text)}
+.gm-fbtn.active{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+.gm-search{flex:1;min-width:160px;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.88rem}
+.gm-search:focus{outline:none;border-color:var(--gold)}
+.gm-main-tabs{display:flex;gap:0;padding:0 20px;background:var(--s1);border-bottom:1px solid var(--border)}
+.gm-mtab{padding:12px 22px;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-weight:700;font-size:.9rem;transition:all .2s}
+.gm-mtab:hover{color:var(--text)}
+.gm-mtab.active{color:var(--gold-l);border-bottom-color:var(--gold)}
+.gm-tags-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.gm-tags-hdr{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.gm-tag-search{width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.88rem;margin-bottom:8px}
+.gm-tag-search:focus{outline:none;border-color:var(--gold)}
+.gm-tags{display:flex;flex-wrap:wrap;gap:6px;max-height:min(240px,42vh);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 0}
+.gm-tags-empty{font-size:.82rem;color:var(--muted);padding:6px 2px}
+.gm-tag{padding:6px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+.gm-tag:hover{border-color:var(--gold-d);color:var(--text)}
+.gm-tag.active{background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border-color:var(--gold);color:var(--gold-l)}
+.gm-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:stretch;flex-wrap:nowrap}
+@media(max-width:640px){.gm-card{flex-wrap:wrap}}
+.gm-nick-col{margin-left:auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:6px;min-width:100px;flex-shrink:0;padding-left:12px;border-left:1px solid var(--border)}
+@media(max-width:640px){.gm-nick-col{width:100%;margin-left:0;border-left:none;border-top:1px solid var(--border);padding-left:0;padding-top:10px;align-items:flex-start;text-align:left}}
+.gm-nick-big{font-size:1.45rem;font-weight:800;color:var(--gold-l);line-height:1.15;word-break:break-word;max-width:180px}
+.gm-nick-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.gm-icon-wrap{flex-shrink:0;border-radius:12px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;box-sizing:border-box;overflow:hidden}
+.gm-icon-wrap.gm-icon-quality{border-style:solid;padding:6px}
+.gm-icon-wrap.gm-q-normal{border-color:#7a7a7a}
+.gm-icon-wrap.gm-q-good{border-color:#6a8fa8;box-shadow:0 0 0 1px rgba(106,143,168,.35),0 0 8px rgba(106,143,168,.28)}
+.gm-icon-wrap.gm-q-outstanding{border-color:#c9782a;box-shadow:0 0 0 1px rgba(201,120,42,.35),0 0 10px rgba(201,120,42,.35)}
+.gm-icon-wrap.gm-q-excellent{border-color:#ffffff;box-shadow:0 0 0 1px rgba(255,255,255,.45),0 0 12px rgba(255,255,255,.35)}
+.gm-icon-wrap.gm-q-masterpiece{border-color:#ffd700;box-shadow:0 0 0 1px rgba(255,215,0,.5),0 0 14px rgba(255,215,0,.55)}
+.gm-icon-wrap.gm-icon-plain{border:none;padding:4px}
+.gm-icon-wrap img{width:100%;height:100%;object-fit:contain;display:block}
+.gm-icon-lg{width:104px;height:104px}
+.gm-icon-lg.gm-icon-quality{border-width:4px}
+.gm-icon-preview{width:120px;height:120px;margin-top:10px}
+.gm-icon-preview.gm-icon-quality{border-width:4px}
+.gm-preview-wrap{margin-top:8px}
+.gm-body{flex:1;min-width:200px}
+.gm-title{font-weight:700;font-size:1rem;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.gm-meta{font-size:.78rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;align-items:center}
+.gm-qty{font-size:1.15rem;font-weight:800;color:var(--text);letter-spacing:.02em}
+.gm-price{font-size:1.05rem;font-weight:700;color:var(--gold-l)}
+.gm-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.72rem;font-weight:700;text-transform:uppercase}
+.gm-badge.sell{background:rgba(76,175,80,.15);color:#4caf50;border:1px solid rgba(76,175,80,.4)}
+.gm-badge.buy{background:rgba(85,153,255,.15);color:#5599ff;border:1px solid rgba(85,153,255,.4)}
+.gm-q-pill{display:inline-block;padding:2px 10px;border-radius:6px;font-size:.76rem;font-weight:700;border:1.5px solid}
+.gm-q-pill.gm-q-normal{border-color:#7a7a7a;color:#b0b0b0}
+.gm-q-pill.gm-q-good{border-color:#6a8fa8;color:#9ec4dc}
+.gm-q-pill.gm-q-outstanding{border-color:#c9782a;color:#e8a55a}
+.gm-q-pill.gm-q-excellent{border-color:#ffffff;color:#ffffff}
+.gm-q-pill.gm-q-masterpiece{border-color:#ffd700;color:#ffd700}
+.gm-nick{color:var(--gold);font-weight:600}
+.gm-note-text{font-size:.88rem;color:#d4cfe8;margin-top:6px;line-height:1.45}
+.gm-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.gm-form{background:var(--s1);border:1.5px solid rgba(201,168,76,.35);border-radius:12px;padding:16px;margin-bottom:16px}
+.gm-form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.gm-status{font-size:.82rem;color:var(--muted);min-height:18px;margin-bottom:8px}
+#gm-sdd .sdd-item{padding:10px 14px;gap:14px}
+#gm-sdd .sdd-item img{width:80px;height:80px;border-radius:8px}
+#gm-sdd .sdd-name{font-size:.92rem}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<button id="btn-top" title="Wróć na górę" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+<button id="btn-bot" title="Przejdź na dół" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">▼</button>
+<script>
+// ══════════ TRANSLATIONS ══════════
+const LANGS = {
+pl:{
+  tab_items:'⚔️ Itemki', tab_mats:'🔷 Materiały', tab_settings:'⚙️ Ustawienia',
+  tab_summary:'📋 Podsumowanie', tab_awaiting:'⏳ Oczekuje na sprzedaż',
+  tab_guild:'🏰 Rynek gildii',
+  main_calc:'Kalkulator enchantu', main_guild:'Rynek gildii',
+  btn_add_sum:'📋 Dodaj do podsumowania', btn_in_sum:'✓ W podsumowaniu',
+  btn_to_market:'🏪 Wstawiono na market', btn_sold:'Sprzedano',
+  sum_tab_empty:'Brak itemów. Kliknij "Dodaj do podsumowania" przy kalkulacji.',
+  await_tab_empty:'Brak wystawionych itemów.',
+  stats_title:'📈 Statystyki sprzedaży',
+  stats_today:'Dziś', stats_week:'Tydzień', stats_month:'Miesiąc', stats_all:'All Time',
+  sum_total_profit:'Łączny zarobek', sum_total_invest:'Łączna inwestycja', sum_total_mat:'Łączne materiały',
+  await_total_value:'Łączna wartość wystawionych', await_total_profit:'Spodziewany zysk',
+  listed_at:'wystawiono', sold_str:'sprzedano',
+  search_placeholder:'Szukaj itemu...', search_searching:'Szukam...', search_none:'Brak wyników', search_err:'Błąd wyszukiwania',
+  search_loading:'Ładuję bazę itemów (raz na sesję)...',
+  prem_on:'Premium ON', prem_off:'Premium OFF',
+  city_title:'Wybierz miasto / rynek',
+  city_items:'Itemki na rynku:', city_mats:'Materiały dla rynku:',
+  mat_rune:'Runa', mat_soul:'Dusza', mat_relic:'Relikt',
+  qual:['Normalny','Dobry','Znakomity','Doskonały','Arcydzieło'],
+  type:{
+    '1h':'Broń 1H','2h':'Broń 2H','armor':'Zbroja','bag':'Sakwa',
+    'helm':'Hełm','boots':'Buty','cape':'Peleryna','offhand':'Off-hand',
+    'g_helm':'Gath. Hełm','g_armor':'Gath. Zbroja','g_boots':'Gath. Buty','g_bag':'Gath. Sakwa'
+  },
+  lbl_name:'Nazwa', lbl_type:'Typ', lbl_tier:'Tier', lbl_quality:'Jakość',
+  lbl_range:'Zakres:', lbl_qty:'📦 Ilość (szt.)', lbl_daily:'📊 Dzienna sprzed.',
+  lbl_add:'➕ Dodaj item', lbl_remove:'✕ Usuń',
+  th_step:'Krok', th_mat:'Materiał', th_mat_price:'Cena mat./szt.',
+  th_mat_cost:'Koszt mat.', th_buy:'Cena zakupu', th_sell:'Cena sprzedaży',
+  th_tax_u:'Podatek/szt.', th_tax_t:'Podatek łącznie', th_p_u:'Zysk / szt.',
+  th_p_t:'Zysk ×', th_daily:'Rec. dzienna (20%)', th_worth:'Opłaca się?',
+  s_title:'📊 Podsumowanie:', s_req:'Wymagane materiały',
+  s_mat_total:'Łączny koszt materiałów:',
+  s_buy_u:'Cena zakupu / szt.', s_buy_t:'Cena zakupu ×',
+  s_cost_t:'Łączny koszt całkowity (zakup + mat.) ×',
+  s_sell_u:'Cena sprzedaży / szt.', s_tax_u:'Podatek / szt.',
+  s_tax_t:'Podatek łączny ×', s_net_u:'Netto / szt.', s_net_t:'Netto łączne ×',
+  s_yes:'✓ OPŁACA SIĘ', s_no:'✗ NIE OPŁACA', s_per_u:'/ szt.',
+  s_daily:'Zalecana dzienna:', s_per_day:'/dzień',
+  set_tax_no:'Podatek – bez Premium', set_tax_prem:'Podatek – Premium 👑',
+  set_fee:'Opłata za wystawienie zlecenia',
+  set_fee_hint:'2.5% pobierana przy wystawieniu (Sell Order), niezależnie od premium.',
+  set_tax_hint:'Albion Online: 8% bez / 4% z premium.',
+  set_n_title:'📦 Ilość materiałów N wg typu', set_per_step:'× / krok',
+  lang_lbl:'🌐 Język / Language',
+  no_data:'brak danych', fill_prices:'Uzupełnij ceny, aby zobaczyć kalkulację.',
+  fill_range:'Uzupełnij ceny dla zakresu', to_see_sum:' aby zobaczyć podsumowanie.',
+  instant:'💰 Instant Sell', tax_total:'Podatek łącznie:',
+  city_desc:{
+    'Bridgewatch':'Step','Fort Sterling':'Góry','Lymhurst':'Las',
+    'Martlock':'Wyżyny','Thetford':'Mokradła','Caerleon':'Królewskie Miasto',
+    'Brecilien':'Wieczny Las','Black Market':'Czarny Rynek'
+  },
+  items_count:(n)=>n===1?'1 item':n+' itemów',
+  gm_all:'Wszystko', gm_sell:'Sprzedaż', gm_buy:'Kupię',
+  gm_search:'Szukaj itemu, nick...', gm_refresh:'🔄 Odśwież', gm_add:'➕ Dodaj ogłoszenie',
+  gm_edit:'✏️ Edytuj', gm_delete:'🗑️ Usuń', gm_save:'💾 Zapisz', gm_cancel:'Anuluj',
+  gm_type:'Typ zlecenia', gm_price:'Cena / szt.', gm_qty:'Ilość', gm_note:'Notatka (opcjonalnie)',
+  gm_posted:'Wystawiono', gm_by:' przez ', gm_empty:'Brak ogłoszeń na rynku gildii.',
+  gm_login_required:'Zaloguj się nickiem, aby dodawać ogłoszenia.',
+  gm_no_item:'Wybierz item z wyszukiwarki.', gm_loading:'Ładowanie rynku...',
+  gm_saved:'Zapisano.', gm_deleted:'Usunięto.',
+  gm_confirm_del:'Usunąć to ogłoszenie?',
+  gm_form_title_add:'Nowe ogłoszenie', gm_form_title_edit:'Edycja ogłoszenia',
+  gm_enchant:'Enchant', gm_city:'Miasto / lokalizacja',
+  gm_tab_market:'🛒 Rynek', gm_tab_profession:'📣 Ogłoszenia',
+  gm_tags_lbl:'Kategorie', gm_tag_all:'Wszystkie', gm_tag_other:'Pozostałe',
+  gm_tag_search_ph:'Szukaj kategorii (np. hełm, broń, surowce)…', gm_tag_no_match:'Brak pasujących kategorii',
+  gm_cloud_ok:'☁️ Wczytano bazę danych.',
+  gm_cloud_fail:'⚠️ Brak połączenia z bazą Supabase — widać tylko kopię zapisana w tej przeglądarce. Dotknij „Odśwież” lub sprawdź internet.',
+  gm_no_results:'Brak wyników.',
+  gm_clear_filters:'Wyczyść filtry',
+  gm_guild_tag:'Tag gildii (skrót)',
+  gm_guild_tag_ph:'np. GA',
+  gm_city_any:'Dowolne miejsce',
+  gm_prof_title:'Tytuł ogłoszenia',
+  gm_prof_title_ph:'np. Szukam party na dungeon, sprzedam materiały, oferuję transport…',
+  gm_prof_note:'Treść ogłoszenia (szczegóły, godziny, kontakt…)',
+  gm_prof_icon:'Ikona (opcjonalnie — wyszukaj przedmiot)',
+  gm_prof_add:'➕ Dodaj ogłoszenie', gm_prof_empty:'Brak ogłoszeń.',
+  gm_prof_form_add:'Nowe ogłoszenie', gm_prof_form_edit:'Edycja ogłoszenia',
+  gm_prof_no_title:'Wpisz tytuł ogłoszenia.',
+  gm_prof_toolbar:'Ogłoszenia gildii — oferty, prośby, informacje',
+  gm_profile_edit:'Edytuj profil',
+  gm_profile_title:'Profil',
+  gm_profile_save:'Zapisz profil',
+  gm_profile_updated:'Profil zaktualizowany.',
+  gm_profile_nick_required:'Podaj nick.',
+  gm_banned:'Ten nick jest zablokowany — nie możesz publikować ogłoszeń. Skontaktuj się z administratorem gildii.',
+  gm_ip_banned:'Ten adres IP jest zablokowany — nie możesz publikować ogłoszeń.',
+  gm_login_nick_taken:'Ten nick jest już zajęty.',
+  gm_login_device_has_profile:'Masz już profil — zaloguj się swoim nickiem.',
+  gm_nick_busy:'Ten nick jest już zajęty — wybierz inny.',
+  gm_login_verify_fail:'Nie udało się zweryfikować profilu. Spróbuj ponownie później.',
+  gm_session_invalid:'Sesja wygasła — zaloguj się ponownie.',
+  gm_login_no_ip:'Nie udało się ustalić adresu sieci — wyłącz blokadę reklam/VPN albo spróbuj innej przeglądarki.',
+  gm_rls_block:'Zapis profilu odrzucony przez bazę (uprawnienia RLS). Daj znać adminowi — tabela guild_users.',
+},
+en:{
+  tab_items:'⚔️ Items', tab_mats:'🔷 Materials', tab_settings:'⚙️ Settings',
+  tab_summary:'📋 Summary', tab_awaiting:'⏳ Awaiting Sale',
+  tab_guild:'🏰 Guild Market',
+  main_calc:'Enchant Calculator', main_guild:'Guild Market',
+  btn_add_sum:'📋 Add to Summary', btn_in_sum:'✓ In Summary',
+  btn_to_market:'🏪 Listed on Market', btn_sold:'Sold',
+  sum_tab_empty:'No items added. Click "Add to Summary" in the calculator.',
+  await_tab_empty:'No items currently listed.',
+  stats_title:'📈 Sales Statistics',
+  stats_today:'Today', stats_week:'Week', stats_month:'Month', stats_all:'All Time',
+  sum_total_profit:'Total Profit', sum_total_invest:'Total Investment', sum_total_mat:'Total Materials',
+  await_total_value:'Total Listed Value', await_total_profit:'Expected Profit',
+  listed_at:'listed', sold_str:'sold',
+  search_placeholder:'Search item...', search_searching:'Searching...', search_none:'No results', search_err:'Search error',
+  search_loading:'Loading item database (once per session)...',
+  prem_on:'Premium ON', prem_off:'Premium OFF',
+  city_title:'Select city / market',
+  city_items:'Items on market:', city_mats:'Materials for market:',
+  mat_rune:'Rune', mat_soul:'Soul', mat_relic:'Relic',
+  qual:['Normal','Good','Outstanding','Excellent','Masterpiece'],
+  type:{
+    '1h':'1H Weapon','2h':'2H Weapon','armor':'Armor','bag':'Bag',
+    'helm':'Helm','boots':'Boots','cape':'Cape','offhand':'Off-hand',
+    'g_helm':'Gath. Helm','g_armor':'Gath. Armor','g_boots':'Gath. Boots','g_bag':'Gath. Bag'
+  },
+  lbl_name:'Name', lbl_type:'Type', lbl_tier:'Tier', lbl_quality:'Quality',
+  lbl_range:'Range:', lbl_qty:'📦 Quantity', lbl_daily:'📊 Daily Sales',
+  lbl_add:'➕ Add Item', lbl_remove:'✕ Remove',
+  th_step:'Step', th_mat:'Material', th_mat_price:'Mat. price/unit',
+  th_mat_cost:'Mat. cost', th_buy:'Buy price', th_sell:'Sell price',
+  th_tax_u:'Tax/unit', th_tax_t:'Total tax', th_p_u:'Profit/unit',
+  th_p_t:'Profit ×', th_daily:'Rec. daily (20%)', th_worth:'Worth it?',
+  s_title:'📊 Summary:', s_req:'Required materials',
+  s_mat_total:'Total material cost:',
+  s_buy_u:'Buy price / unit', s_buy_t:'Buy price ×',
+  s_cost_t:'Total cost (buy + mat.) ×',
+  s_sell_u:'Sell price / unit', s_tax_u:'Tax / unit',
+  s_tax_t:'Total tax ×', s_net_u:'Net sell / unit', s_net_t:'Net total ×',
+  s_yes:'✓ PROFITABLE', s_no:'✗ NOT PROFITABLE', s_per_u:' / unit',
+  s_daily:'Rec. daily:', s_per_day:'/day',
+  set_tax_no:'Sales tax – no Premium', set_tax_prem:'Sales tax – Premium 👑',
+  set_fee:'Sell order setup fee',
+  set_fee_hint:'2.5% charged when listing a sell order, regardless of premium.',
+  set_tax_hint:'Albion Online: 8% without / 4% with premium.',
+  set_n_title:'📦 Material amount N by type', set_per_step:'× / step',
+  lang_lbl:'🌐 Język / Language',
+  no_data:'no data', fill_prices:'Fill in prices above to see calculations.',
+  fill_range:'Fill in prices for range', to_see_sum:' to see summary.',
+  instant:'💰 Instant Sell', tax_total:'Total tax:',
+  city_desc:{
+    'Bridgewatch':'Steppe','Fort Sterling':'Mountain','Lymhurst':'Forest',
+    'Martlock':'Highland','Thetford':'Swamp','Caerleon':'Royal City',
+    'Brecilien':'Eternal Forest','Black Market':'Black Market'
+  },
+  items_count:(n)=>n===1?'1 item':n+' items',
+  gm_all:'All', gm_sell:'Sell', gm_buy:'Buy',
+  gm_search:'Search item, nick...', gm_refresh:'🔄 Refresh', gm_add:'➕ Add listing',
+  gm_edit:'✏️ Edit', gm_delete:'🗑️ Delete', gm_save:'💾 Save', gm_cancel:'Cancel',
+  gm_type:'Order type', gm_price:'Price / unit', gm_qty:'Quantity', gm_note:'Note (optional)',
+  gm_posted:'Listed', gm_by:' by ', gm_empty:'No guild market listings yet.',
+  gm_login_required:'Log in with your nick to add listings.',
+  gm_no_item:'Pick an item from search.', gm_loading:'Loading market...',
+  gm_saved:'Saved.', gm_deleted:'Deleted.',
+  gm_confirm_del:'Delete this listing?',
+  gm_form_title_add:'New listing', gm_form_title_edit:'Edit listing',
+  gm_enchant:'Enchant', gm_city:'City / location',
+  gm_tab_market:'🛒 Market', gm_tab_profession:'📣 Announcements',
+  gm_tags_lbl:'Categories', gm_tag_all:'All', gm_tag_other:'Other',
+  gm_tag_search_ph:'Search categories (e.g. helm, weapon, resources)…', gm_tag_no_match:'No matching categories',
+  gm_cloud_ok:'☁️ Database loaded.',
+  gm_cloud_fail:'⚠️ Could not reach Supabase — showing copy saved in this browser only. Tap Refresh or check your connection.',
+  gm_no_results:'No results.',
+  gm_clear_filters:'Clear filters',
+  gm_guild_tag:'Guild tag (abbrev.)',
+  gm_guild_tag_ph:'e.g. GA',
+  gm_city_any:'Anywhere',
+  gm_prof_title:'Announcement title',
+  gm_prof_title_ph:'e.g. LFG for dungeon, selling mats, offering transport…',
+  gm_prof_note:'Message (details, hours, contact…)',
+  gm_prof_icon:'Icon (optional — search item)',
+  gm_prof_add:'➕ Post announcement', gm_prof_empty:'No announcements yet.',
+  gm_prof_form_add:'New announcement', gm_prof_form_edit:'Edit announcement',
+  gm_prof_no_title:'Enter an announcement title.',
+  gm_prof_toolbar:'Guild announcements — offers, requests, info',
+  gm_profile_edit:'Edit profile',
+  gm_profile_title:'Profile',
+  gm_profile_save:'Save profile',
+  gm_profile_updated:'Profile updated.',
+  gm_profile_nick_required:'Enter a nick.',
+  gm_banned:'This nick is blocked — you cannot post. Contact your guild admin.',
+  gm_ip_banned:'This IP address is blocked — you cannot post.',
+  gm_login_nick_taken:'This nick is already taken.',
+  gm_login_device_has_profile:'You already have a profile — log in with your nick.',
+  gm_nick_busy:'This nick is already taken — choose another.',
+  gm_login_verify_fail:'Could not verify your profile. Try again later.',
+  gm_session_invalid:'Session expired — please log in again.',
+  gm_login_no_ip:'Could not detect your network address — try another browser or disable ad blockers.',
+  gm_rls_block:'Profile save rejected by database (RLS). Ask admin to fix guild_users permissions.',
+}};
+
+// ══════════ CONSTANTS ══════════
+const ITEM_TYPE_KEYS = {
+  '1h':      {emoji:'⚔️', n:288},
+  '2h':      {emoji:'🗡️', n:384},
+  'armor':   {emoji:'🛡️', n:192},
+  'bag':     {emoji:'🎒', n:192},
+  'helm':    {emoji:'⛑️', n: 96},
+  'boots':   {emoji:'👟', n: 96},
+  'cape':    {emoji:'🧣', n: 96},
+  'offhand': {emoji:'🔰', n: 96},
+  'g_helm':  {emoji:'⛏️', n: 96},
+  'g_armor': {emoji:'🪖', n:192},
+  'g_boots': {emoji:'🥾', n: 96},
+  'g_bag':   {emoji:'🎽', n:192},
+};
+const APP_VERSION = 'rynek-gildii-20';
+function ensureFreshHtmlVersion(){
+  const k='ao_guild_html_ver';
+  const prev=localStorage.getItem(k);
+  if(prev&&prev!==APP_VERSION&&!/[?&]_nc=/.test(location.search||'')){
+    localStorage.setItem(k,APP_VERSION);
+    const sep=location.search?'&':'?';
+    location.replace(location.pathname+location.search+sep+'_nc='+Date.now());
+    return true;
+  }
+  localStorage.setItem(k,APP_VERSION);
+  return false;
+}
+const QUALITY_KEYS = ['Normal','Good','Outstanding','Excellent','Masterpiece'];
+const QUALITY_CLASS = {
+  Normal:'gm-q-normal', Good:'gm-q-good', Outstanding:'gm-q-outstanding',
+  Excellent:'gm-q-excellent', Masterpiece:'gm-q-masterpiece'
+};
+const TIERS = ['T4','T5','T6','T7','T8'];
+const GM_TIERS = ['T1','T2','T3','T4','T5','T6','T7','T8'];
+// Tier colors: T1–T3 low tiers, T4=blue … T8=white
+const TIER_C = {T1:'#b0b0b0',T2:'#55bb55',T3:'#55aadd',T4:'#4488ff',T5:'#ff3333',T6:'#ff8820',T7:'#ffdd00',T8:'#e8e8e8'};
+const TIER_PFX    = {T4:"Adept's",   T5:"Expert's",   T6:"Master's",    T7:"Grandmaster's", T8:"Elder's"};
+const TIER_PFX_PL = {T4:'Adepta',    T5:'Eksperta',   T6:'Mistrza',     T7:'Arcymistrza',   T8:'Starszego'};
+const MAT_TYPES = ['rune','soul','relic'];
+// Enchant dot colors: 0=grey, 1=green, 2=blue, 3=purple
+const ENC_COLS  = ['#777','#3dbf40','#4488ff','#aa44ff'];
+const ENC_DOTS  = ['d0','d1','d2','d3'];
+const ENC = ['.0','.1','.2','.3'];
+const STEP_MAT  = ['rune','soul','relic'];
+const STEP_COL  = ['#3dbf40','#4488ff','#aa44ff'];
+
+const CITIES = {
+  'Bridgewatch':   {icon:'🏜️',color:'#f08020'},
+  'Fort Sterling': {icon:'❄️', color:'#80b8d0'},
+  'Lymhurst':      {icon:'🌿',color:'#40a840'},
+  'Martlock':      {icon:'⚓',color:'#4060c0'},
+  'Thetford':      {icon:'☠️',color:'#804020'},
+  'Caerleon':      {icon:'👑',color:'#c02020'},
+  'Brecilien':     {icon:'🌀',color:'#8030c0'},
+  'Black Market':  {icon:'🎭',color:'#505068'},
+};
+const CITY_LIST = Object.keys(CITIES);
+const GM_CITIES = {...CITIES,ANY:{icon:'📍',color:'#888888'}};
+const GM_CITY_LIST = [...CITY_LIST,'ANY'];
+function gmCityLabel(city){
+  if(city==='ANY')return t('gm_city_any');
+  return city;
+}
+const PREM_IMG   = 'https://preview.redd.it/well-well-well-who-broke-shit-again-yep-albion-devs-this-is-v0-cdr4mnytvzsg1.png?auto=webp&s=a18965d3c499e603921e733645a1337fafd5ebbf';
+const BRIDGE_IMG = 'https://i.redd.it/arpbwq03qnub1.png';
+
+function matImg(tier,mat){
+  const p=encodeURIComponent(TIER_PFX[tier]||'');
+  const n=mat==='rune'?'Rune':mat==='soul'?'Soul':'Relic';
+  return `https://render.albiononline.com/v1/item/${p}%20${n}.png?locale=en`;
+}
+
+// Migration maps for old saves
+const OLD_TYPE_MAP = {
+  'Broń 1H':'1h','Broń 2H':'2h','Zbroja':'armor','Sakwa':'bag','Plecak':'bag',
+  'Hełm':'helm','Buty':'boots','Peleryna':'cape','Off-hand':'offhand',
+  'Gath. Hełm':'g_helm','Gath. Zbroja':'g_armor','Gath. Buty':'g_boots',
+  'Gath. Sakwa':'g_bag','Gath. Plecak':'g_bag',
+  '1H Weapon':'1h','2H Weapon':'2h','Armor':'armor','Bag':'bag',
+  'Helm':'helm','Boots':'boots','Cape':'cape',
+  'Gath. Helm':'g_helm','Gath. Armor':'g_armor','Gath. Boots':'g_boots','Gath. Bag':'g_bag',
+};
+const OLD_QUAL_MAP = {
+  'Normalny':'Normal','Dobry':'Good','Wybitny':'Outstanding',
+  'Doskonały':'Excellent','Arcydzieło':'Masterpiece',
+};
+
+// ══════════ STATE ══════════
+function emptyMats(){return Object.fromEntries(TIERS.map(t=>[t,{rune:'',soul:'',relic:''}]));}
+function isEmptyMatVal(v){return v===''||v==null||v===undefined;}
+function mergeCityMats(cloudM,localM,preferLocal=false){
+  const out={};
+  TIERS.forEach(tier=>{
+    out[tier]={rune:'',soul:'',relic:''};
+    MAT_TYPES.forEach(m=>{
+      const cv=cloudM?.[tier]?.[m],lv=localM?.[tier]?.[m];
+      const ce=isEmptyMatVal(cv),le=isEmptyMatVal(lv);
+      if(ce&&le)out[tier][m]='';
+      else if(ce)out[tier][m]=String(lv);
+      else if(le)out[tier][m]=String(cv);
+      else out[tier][m]=preferLocal?String(lv):String(cv);
+    });
+  });
+  return out;
+}
+function mergeListings(a=[],b=[]){
+  const map=new Map();
+  [...(a||[]),...(b||[])].forEach(l=>{
+    if(!l||l.id==null)return;
+    const k=String(l.id),prev=map.get(k);
+    if(!prev||(l.listedAt||0)>=(prev.listedAt||0))map.set(k,l);
+  });
+  return [...map.values()];
+}
+function mergeSalesHistory(a=[],b=[]){
+  const map=new Map();
+  [...(a||[]),...(b||[])].forEach(s=>{
+    if(!s)return;
+    const k=`${s.id||''}_${s.soldAt||0}_${s.name||''}_${s.profit||0}`;
+    map.set(k,s);
+  });
+  return [...map.values()];
+}
+function mergeItemsByCity(local={},cloud={}){
+  const out={};
+  CITY_LIST.forEach(c=>{
+    const map=new Map();
+    [...(cloud?.[c]||[]),...(local?.[c]||[])].forEach(item=>{
+      if(!item||item.id==null)return;
+      const prev=map.get(item.id);
+      map.set(item.id,prev?{...prev,...item}:item);
+    });
+    out[c]=[...map.values()];
+  });
+  return out;
+}
+function mergeMaterialsByCity(local={},cloud={},localTs,cloudTs){
+  const preferLocal=localTs>=cloudTs;
+  const out={};
+  CITY_LIST.forEach(c=>{
+    out[c]=mergeCityMats(cloud?.[c],local?.[c],preferLocal);
+  });
+  return out;
+}
+function mergeCloudIntoLocal(cloudData,cloudUpdatedAt){
+  if(!cloudData)return;
+  const local=JSON.parse(localStorage.getItem('ao_ec_v7')||'{}');
+  const localTs=local.updated_at_ts||0;
+  const cloudTs=Math.max(cloudData.updated_at_ts||0,cloudUpdatedAt?new Date(cloudUpdatedAt).getTime():0);
+  const preferLocal=localTs>=cloudTs;
+  const merged={
+    lang:preferLocal?(local.lang??cloudData.lang):(cloudData.lang??local.lang),
+    premium:preferLocal?!!local.premium:!!cloudData.premium,
+    activeCity:local.activeCity??cloudData.activeCity??'Bridgewatch',
+    activeTab:local.activeTab??cloudData.activeTab??'items',
+    mainSection:local.mainSection??cloudData.mainSection??'calc',
+    settings:{...(cloudData.settings||{}),...(local.settings||{})},
+    sort:local.sort??cloudData.sort??{key:'none',dir:'asc'},
+    nextId:Math.max(local.nextId||1,cloudData.nextId||1),
+    nextListingId:Math.max(local.nextListingId||1,cloudData.nextListingId||1),
+    listings:mergeListings(local.listings,cloudData.listings),
+    salesHistory:mergeSalesHistory(local.salesHistory,cloudData.salesHistory),
+    itemsByCity:mergeItemsByCity(local.itemsByCity,cloudData.itemsByCity),
+    materialsByCity:mergeMaterialsByCity(local.materialsByCity,cloudData.materialsByCity,localTs,cloudTs),
+    updated_at_ts:Math.max(localTs,cloudTs,Date.now())
+  };
+  localStorage.setItem('ao_ec_v7',JSON.stringify(merged));
+}
+function parseMatKey(key){
+  const i=key.lastIndexOf('-');
+  return i<0?[key,'']:[key.slice(0,i),key.slice(i+1)];
+}
+function listingIdMatch(a,b){return String(a)===String(b);}
+
+let state = { lang:'pl', activeCity:'Bridgewatch' };
+function savePrefs(){localStorage.setItem('ao_guild_prefs',JSON.stringify({lang:state.lang,activeCity:state.activeCity,guildMainTab}));}
+function loadPrefs(){try{const d=JSON.parse(localStorage.getItem('ao_guild_prefs')||'{}');if(d.lang)state.lang=d.lang;if(d.activeCity)state.activeCity=d.activeCity;if(d.guildMainTab)guildMainTab=d.guildMainTab;}catch(_){}}
+
+/** Kategorie = główne węzły typu itemu (prefiks unique_base_name jak w bazie AO). */
+const GM_TAGS=[
+  {id:'head_hood',pl:'Kaptury / kapuze',en:'Hoods / cowls',keys:['kaptur','kapuza','hood','cowl','kaptór'],match:b=>/^HEAD_CLOTH/.test(b)},
+  {id:'head_helm',pl:'Hełmy',en:'Helms',keys:['hełm','helm','helmet'],match:b=>/^HEAD_PLATE/.test(b)||/^HEAD_LEATHER/.test(b)},
+  {id:'armor_robe',pl:'Szaty',en:'Robes',keys:['szata','robe','suknia','cloth armor'],match:b=>/^ARMOR_CLOTH/.test(b)},
+  {id:'armor_jacket',pl:'Kurtki (skóra)',en:'Leather jackets',keys:['kurtka','jacket','skórzana zbroja'],match:b=>/^ARMOR_LEATHER/.test(b)},
+  {id:'armor_plate',pl:'Zbroje płytowe',en:'Plate armor',keys:['zbroja','płytowa','plate','pancerz'],match:b=>/^ARMOR_PLATE/.test(b)},
+  {id:'shoes_plate',pl:'Buty płytowe',en:'Plate boots',keys:['buty płyt','plate boot','sabaton'],match:b=>/^SHOES_PLATE/.test(b)},
+  {id:'shoes_sandal',pl:'Sandały (tkanina)',en:'Sandals (cloth)',keys:['sandał','sandal','buty tkan'],match:b=>/^SHOES_CLOTH/.test(b)},
+  {id:'shoes_leather',pl:'Buty skórzane',en:'Leather shoes',keys:['buty skó','leather boot'],match:b=>/^SHOES_LEATHER/.test(b)},
+  {id:'weapon_2h',pl:'Broń oburęczna (2H)',en:'Two-handed (2H)',keys:['2h','oburęcz','dwuręcz','two hand'],match:b=>/^2H_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'weapon_1h',pl:'Broń jednoręczna (1H)',en:'One-handed (1H)',keys:['1h','jednoręcz','main hand'],match:b=>/^MAIN_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'w_hammer',pl:'Młoty',en:'Hammers',keys:['młot','hammer','gavel','morningstar'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/HAMMER|GAVEL|MORNINGSTAR/i.test(b)&&!/MACE/i.test(b)},
+  {id:'w_mace',pl:'Buławy',en:'Maces',keys:['buława','mace','flail'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/MACE|FLAIL|CLAWS_MACE/i.test(b)&&!/HAMMER|GAVEL/i.test(b)},
+  {id:'w_bow',pl:'Łuki',en:'Bows',keys:['łuk','bow','longbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/BOW/i.test(b)&&!/CROSSBOW/i.test(b)},
+  {id:'w_crossbow',pl:'Kusze',en:'Crossbows',keys:['kusza','crossbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/CROSSBOW/i.test(b)},
+  {id:'w_staff_holy',pl:'Święte kostury',en:'Holy staves',keys:['święt','holy','kostur św'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&(/HOLYSTAFF|HOLY_STAFF|HOLY_SCEPTER|HOLY_WAND/i.test(b)||(/HOLY/i.test(b)&&/STAFF|SCEPTER|WAND/i.test(b)))},
+  {id:'w_staff_morph',pl:'Kostury zmiennokształtne',en:'Shapeshifter staves',keys:['zmiennokształt','shapeshift','transform'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/SHAPESHIFT/i.test(b)},
+  {id:'w_staff_quarter',pl:'Kije',en:'Quarterstaffs',keys:['kij','quarterstaff','kij bojowy'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/QUARTERSTAFF/i.test(b)},
+  {id:'w_staff',pl:'Kostury / różdżki',en:'Staves / wands',keys:['kostur','staff','laska','wand','scepter'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/STAFF|SCEPTER|WAND/i.test(b)&&!/HAMMER|MACE|GAVEL|QUARTERSTAFF|HOLY|SHAPESHIFT/i.test(b)},
+  {id:'w_sword',pl:'Miecze',en:'Swords',keys:['miecz','sword','sabre','rapier'],match:b=>/^MAIN_|^2H_/.test(b)&&/SWORD|SABRE|CLAYMORE|BROADSWORD|RAPIER|CARVING/i.test(b)},
+  {id:'w_axe',pl:'Topory',en:'Axes',keys:['topor','axe','cleaver'],match:b=>/^MAIN_|^2H_/.test(b)&&/AXE|CHOPPER|CLEAVER|BEARPAW|CARVE/i.test(b)&&!/PICKAXE/i.test(b)},
+  {id:'w_spear',pl:'Włócznie / halabardy',en:'Spears / halberds',keys:['włócz','spear','pike','halberd','trident'],match:b=>/^MAIN_|^2H_/.test(b)&&/SPEAR|PIKE|HALBERD|TRIDENT|GLAIVE|SPIKED/i.test(b)},
+  {id:'w_dagger',pl:'Sztylety / szpony',en:'Daggers / claws',keys:['sztylet','dagger','claw','dual','pięści','szpon'],match:b=>/^MAIN_|^2H_/.test(b)&&/DAGGER|CLAW|DUAL|KNUCKLE|FIST/i.test(b)},
+  {id:'w_arcane',pl:'Broń magiczna',en:'Magic weapons',keys:['magia','arcane','fire','frost','nature','curse','kląt'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/(CURSED|FIRE|FROST|NATURE|ARCANE)/i.test(b)&&!/HOLY|SHAPESHIFT/i.test(b)&&!/^(HEAD_|ARMOR_|SHOES_)/.test(b)},
+  {id:'food',pl:'Jedzenie',en:'Food',keys:['jedzen','food','meal','potraw','chleb','bread'],match:b=>!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b)&&/MEAL_|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|GRILLEDFISH|BREAD|AVALONIAN.*MEAL/i.test(b)&&!/POTION|POISON|SKILLBOOK|FISHSAUCE|FISHCHOPS|_SEED/i.test(b)},
+  {id:'cook_mats',pl:'Składniki gotowania',en:'Cooking ingredients',keys:['składnik','gotow','kuchn','ziarno','seed','ryba surow','sos rybny'],match:b=>{
+    if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
+    if(/POTION|POISON|SKILLBOOK|MEAL_|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|GRILLEDFISH/i.test(b))return false;
+    if(/FARM_|_SEED|CARROT|WHEAT|BEAN|CABBAGE|WORM|TURNIP|PUMPKIN|COMPOST|FISHSAUCE|BLOODBROTH|ALCOHOL|FISHCHOPS|SEAWEED|FISHINGBAIT|YEAST/i.test(b))return true;
+    if(/FISH_(FRESHWATER|SALTWATER)/i.test(b)&&!/_RARE|CHOPS/i.test(b))return true;
+    return false;
+  }},
+  {id:'potions',pl:'Potki',en:'Potions',keys:['potka','potion','mikstura'],match:b=>/POTION|POISON/i.test(b)},
+  {id:'hunting_loot',pl:'Polowanie (szczątki / trofea)',en:'Hunting (remains / trophies)',keys:['polow','tracking','szczątk','remains','trofea','wildlife','alchemy_common'],match:b=>/TRACKING|TRACKINGITEM|WILDLIFE|HUNTING|ALCHEMY_COMMON|ALCHEMY_RARE/i.test(b)&&!/SKILLBOOK|TOME_WEAPON|ALCHEMY_EXTRACT/i.test(b)},
+  {id:'shields',pl:'Tarcze',en:'Shields',keys:['tarcza','shield'],match:b=>/SHIELD/.test(b)},
+  {id:'offhand',pl:'Dłoń pomocnicza',en:'Off-hand (no shields)',keys:['offhand','torch','księga','book','świeca','orbe','dłoń pomoc'],match:b=>/^OFF_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'gather_gear',pl:'Zbieracz (ekwipunek)',en:'Gatherer gear',keys:['zbieracz','gather','gath'],match:b=>/^GATHERER_/.test(b)},
+  {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',keys:['torba','bag','cape','peleryn','sakwa'],match:b=>/^BAG|^CAPE|^SATCHEL/.test(b)},
+  {id:'mount',pl:'Wierzchowce',en:'Mounts',keys:['mount','koń','horse','wierzch','osioł'],match:b=>!/^MAIN_|^2H_|^OFF_|^ARMOR_|^HEAD_|^SHOES_/.test(b)&&/HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM/.test(b)},
+  {id:'resources',pl:'Surowce / materiały',en:'Resources / materials',keys:['surow','ruda','ore','hide','skóra surow','fiber','włókno','wood','drewno','rock','kamień','plank','bar'],match:b=>!/^MAIN_|^2H_|^OFF_|^HEAD_|^ARMOR_|^SHOES_|^GATHERER_|^BAG|^CAPE/.test(b)&&/(^|_)(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW|BLOCK)/.test(b)},
+  {id:'tools',pl:'Narzędzia',en:'Tools',keys:['tool','narzęd','kilof','sickle','sierp'],match:b=>/SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TOOL|HAMMER_TOOL/i.test(b)&&!/^MAIN_|^2H_|^ARMOR_|^HEAD_/.test(b)},
+];
+let guildMainTab='market';
+let guildTagFilter='';
+let guildTagSearch='';
+function gmTagLabel(tag){return state.lang==='pl'?tag.pl:tag.en;}
+function tagsMatchingQuery(q){
+  const qq=(q||'').trim().toLowerCase();
+  if(!qq)return GM_TAGS;
+  return GM_TAGS.filter(tag=>{
+    if(gmTagLabel(tag).toLowerCase().includes(qq))return true;
+    if(tag.id.includes(qq))return true;
+    if((tag.keys||[]).some(k=>k.includes(qq)))return true;
+    return false;
+  });
+}
+function buildGuildTagPanel(){
+  const visible=tagsMatchingQuery(guildTagSearch);
+  const pills=visible.map(tag=>{
+    const lbl=gmTagLabel(tag);
+    return `<button type="button" class="gm-tag${guildTagFilter===tag.id?' active':''}" data-gm-tag="${tag.id}">${esc(lbl)}</button>`;
+  }).join('');
+  return`<div class="gm-tags-panel">
+    <div class="gm-tags-hdr">${t('gm_tags_lbl')}</div>
+    <input type="search" class="gm-tag-search" id="gm-tag-search-inp" value="${esc(guildTagSearch)}" placeholder="${esc(t('gm_tag_search_ph'))}" autocomplete="off" enterkeyhint="search">
+    <div class="gm-tags">
+      <button type="button" class="gm-tag${!guildTagFilter?' active':''}" data-gm-tag="">${t('gm_tag_all')}</button>
+      ${pills||`<span class="gm-tags-empty">${t('gm_tag_no_match')}</span>`}
+      <button type="button" class="gm-tag${guildTagFilter==='other'?' active':''}" data-gm-tag="other">${t('gm_tag_other')}</button>
+    </div>
+  </div>`;
+}
+
+// ══════════ GUILD MARKET ══════════
+const SB_GUILD_TABLE = 'guild_market';
+const SB_BANS_TABLE = 'guild_bans';
+const SB_USERS_TABLE = 'guild_users';
+const GM_LS_KEY = 'ao_guild_market_v1';
+let guildBanNicks = new Set();
+let guildBanIps = new Set();
+let _cachedClientIp = null;
+let guildListings = [];
+let guildFilter = 'all';
+let guildSearch = '';
+let guildFormOpen = false;
+let guildEditingId = null;
+let guildForm = {order_type:'sell',item_name:'',item_name_pl:'',item_name_en:'',unique_base_name:'',tier:'T4',quality:'Excellent',enchant:0,price:'',qty:1,note:'',city:'Bridgewatch'};
+let guildLoading = false;
+let guildStatus = '';
+let guildCloudOk = null;
+let nextGuildLocalId = 1;
+let profFormOpen=false;
+let profEditingId=null;
+let profForm={title:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
+try{
+  const _gm=JSON.parse(localStorage.getItem(GM_LS_KEY)||'[]');
+  if(Array.isArray(_gm)){
+    guildListings=_gm;
+    nextGuildLocalId=Math.max(1,..._gm.map(x=>+x.id||0))+1;
+  }
+}catch(_){}
+
+const GM_ENC=['.0','.1','.2','.3','.4'];
+function gmEncStr(level){return GM_ENC[+level]||'.0';}
+function normalizeItemBase(baseName,tier){
+  let b=(baseName||'').trim().toUpperCase();
+  const t=(tier||'T4').toUpperCase();
+  if(b.startsWith(t+'_'))b=b.slice(t.length+1);
+  b=b.replace(/^T\d+_/,'');
+  b=b.replace(/_LEVEL\d+@\d+$/i,'').replace(/@\d+$/i,'');
+  return b;
+}
+/** Klucz render.albiononline.com — surowce: T4_X_LEVEL2@2, ekwipunek: T4_X@2 */
+function guildItemRenderKey(entry){
+  if(!entry.unique_base_name)return null;
+  const tier=(entry.tier||'T4').toUpperCase();
+  const base=normalizeItemBase(entry.unique_base_name,tier);
+  const enc=Math.min(4,Math.max(0,+entry.enchant||0));
+  if(itemHasResourceEnchant(base)){
+    if(enc>0)return `${tier}_${base}_LEVEL${enc}@${enc}`;
+    return `${tier}_${base}`;
+  }
+  if(itemHasGearEnchant(base)&&enc>0)return `${tier}_${base}@${enc}`;
+  return `${tier}_${base}`;
+}
+function guildItemIconUrl(entry){
+  const key=guildItemRenderKey(entry);
+  if(!key)return null;
+  return`https://render.albiononline.com/v1/item/${encodeURIComponent(key)}.png`;
+}
+function isNonQualityMaterial(baseName){
+  if(!baseName)return true;
+  const b=baseName.toUpperCase();
+  if(/^(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW)/.test(b))return true;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|TRACKING|TRACKINGITEM|WILDLIFE|ALCHEMY_COMMON|ALCHEMY_RARE/i.test(b)&&!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return true;
+  if(!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_|BAG|CAPE)/.test(b)&&/(ORE|HIDE|FIBER|WOOD|ROCK|PLANK|METALBAR|STONEBLOCK)/i.test(b))return true;
+  return false;
+}
+function itemHasResourceEnchant(baseName){
+  if(!baseName)return false;
+  const b=normalizeItemBase(baseName,'T4');
+  if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
+  if(/^BAG|^CAPE/.test(b))return false;
+  if(/POTION|FOOD|MEAL|FISH|BREAD|OMELETTE|TOME|STUFFED|WHEAT|BEAN|CARROT|SALAD|SEED|HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM|TOOL|SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TRACKING|TRACKINGITEM|WILDLIFE|ALCHEMY_COMMON|ALCHEMY_RARE|ALCHEMY_EXTRACT|FISHSAUCE|BLOODBROTH|ALCOHOL/i.test(b))return false;
+  return /(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|BLOCK|REFINED|CLOTH|LEATHER|POWDER|RUNE|SOUL|RELIC)/i.test(b);
+}
+function itemHasGearEnchant(baseName){
+  if(!baseName)return false;
+  const b=normalizeItemBase(baseName,'T4');
+  if(b.startsWith('BAG')||b.startsWith('CAPE'))return false;
+  if(b.startsWith('2H_')||b.startsWith('MAIN_')||b.startsWith('OFF_'))return true;
+  if(b.startsWith('HEAD_')||b.startsWith('ARMOR_')||b.startsWith('SHOES_'))return true;
+  if(b.startsWith('GATHERER_'))return true;
+  return false;
+}
+function itemHasEnchant(baseName){
+  return itemHasGearEnchant(baseName)||itemHasResourceEnchant(baseName);
+}
+function guildMaxEnchantLevel(baseName){
+  if(itemHasEnchant(baseName))return 4;
+  return 0;
+}
+function guildEnchantLevels(baseName){
+  if(!itemHasEnchant(baseName))return [];
+  const top=guildMaxEnchantLevel(baseName);
+  return Array.from({length:top+1},(_,i)=>i);
+}
+function itemHasQuality(baseName,tier){
+  if(!baseName||isNonQualityMaterial(baseName))return false;
+  const b=baseName.toUpperCase();
+  if(b.startsWith('2H_')||b.startsWith('MAIN_')||b.startsWith('OFF_'))return true;
+  if(b.startsWith('HEAD_')||b.startsWith('ARMOR_')||b.startsWith('SHOES_'))return true;
+  if(b.startsWith('GATHERER_'))return true;
+  if(b.startsWith('BAG')||b.startsWith('CAPE'))return true;
+  return false;
+}
+function syncGuildFormQualityFlags(){
+  if(!guildForm.unique_base_name)return;
+  if(!itemHasQuality(guildForm.unique_base_name,guildForm.tier))guildForm.quality='Normal';
+  if(!itemHasEnchant(guildForm.unique_base_name))guildForm.enchant=0;
+  else{
+    const max=guildMaxEnchantLevel(guildForm.unique_base_name);
+    if(+guildForm.enchant>max)guildForm.enchant=max;
+  }
+}
+function buildGuildIconHtml(entry,sizeClass){
+  sizeClass=sizeClass||'gm-icon-lg';
+  const iconUrl=guildItemIconUrl(entry);
+  const hasGearQ=itemHasQuality(entry.unique_base_name,entry.tier);
+  const inner=iconUrl?`<img src="${esc(iconUrl)}" alt="" onerror="this.parentElement.textContent='📦'">`:'<span style="font-size:2.4rem;line-height:1">📦</span>';
+  if(!entry.unique_base_name)return `<div class="gm-icon-wrap gm-icon-plain ${sizeClass}">${inner}</div>`;
+  if(!hasGearQ)return `<div class="gm-icon-wrap gm-icon-plain ${sizeClass}">${inner}</div>`;
+  const qClass=QUALITY_CLASS[entry.quality]||QUALITY_CLASS.Normal;
+  return `<div class="gm-icon-wrap gm-icon-quality ${qClass} ${sizeClass}">${inner}</div>`;
+}
+function guildCityInfo(city){return GM_CITIES[city]||null;}
+function lookupItemNames(tier,base){
+  if(!_itemDB||!base)return null;
+  const t=(tier||'T4').toUpperCase();
+  const norm=normalizeItemBase(base,t);
+  const key=t+'_'+norm;
+  return _itemDB[key]||_itemDB[t+'_'+String(base).toUpperCase()]||null;
+}
+function listingDisplayName(l){
+  if(!l)return '';
+  const names=lookupItemNames(l.tier,l.unique_base_name);
+  if(state.lang==='en'){
+    return (l.item_name_en||names?.en||names?.pl||l.item_name||'').trim();
+  }
+  return (l.item_name_pl||names?.pl||names?.en||l.item_name||'').trim();
+}
+const GM_NOTE_TAG_RE=/^⌁([^⌁]{1,12})⌁/;
+function parseListingNote(note){
+  const raw=note||'';
+  const m=raw.match(GM_NOTE_TAG_RE);
+  if(!m)return{tag:'',body:raw};
+  return{tag:m[1].trim(),body:raw.slice(m[0].length)};
+}
+function listingGuildTag(l){
+  if(!l)return'';
+  const col=(l.guild_tag||'').trim();
+  if(col)return col;
+  return parseListingNote(l.note).tag;
+}
+function noteBodyForForm(note){
+  return parseListingNote(note||'').body.trim();
+}
+function listingNoteText(l){
+  if(!l)return'';
+  return noteBodyForForm(l.note);
+}
+function formatListingNick(l){
+  const n=(l.nick||'?').trim();
+  const tag=listingGuildTag(l);
+  return tag?`${n} [${tag}]`:n;
+}
+function fmtGuildDate(iso){
+  if(!iso)return '—';
+  try{
+    return new Date(iso).toLocaleString(state.lang==='pl'?'pl-PL':'en-GB',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }catch{return '—';}
+}
+function isGuildOwner(listing){
+  return cloudNick&&listing.nick&&listing.nick.toLowerCase()===cloudNick.toLowerCase();
+}
+function isProfessionListing(l){return l.order_type==='profession';}
+function isNickBanned(nick){
+  const k=(nick||'').trim().toLowerCase();
+  return !!k&&guildBanNicks.has(k);
+}
+function isIpBanned(ip){
+  const k=(ip||'').trim();
+  return !!k&&guildBanIps.has(k);
+}
+function nickKey(n){return(n||'').trim().toLowerCase();}
+async function fetchGuildUserRow(query){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?${query}&select=nick_key,nick_display,ip,guild_tag&limit=1`,{
+      headers:{...sbH(),Accept:'application/json'},
+      cache:'no-store'
+    });
+    if(!r.ok)return null;
+    const rows=await r.json();
+    return Array.isArray(rows)&&rows[0]?rows[0]:null;
+  }catch(_){return null;}
+}
+async function verifyLoginAllowed(nick,ip){
+  const key=nickKey(nick);
+  if(!key)return{ok:false,msg:'gm_profile_nick_required'};
+  if(!ip)return{ok:false,msg:'gm_login_verify_fail'};
+  const byNick=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(key)}`);
+  if(byNick){
+    if(byNick.ip===ip)return{ok:true,existing:true};
+    return{ok:false,msg:'gm_login_nick_taken'};
+  }
+  const byIp=await fetchGuildUserRow(`ip=eq.${encodeURIComponent(ip)}`);
+  if(byIp&&byIp.nick_key!==key)return{ok:false,msg:'gm_login_device_has_profile'};
+  return{ok:true,existing:false};
+}
+async function registerGuildUser(nick,ip,guildTag){
+  const key=nickKey(nick);
+  const display=(nick||'').trim();
+  const body={
+    nick_key:key,
+    nick_display:display,
+    ip,
+    guild_tag:(guildTag||'').trim()||null,
+    updated_at:new Date().toISOString()
+  };
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}`,{
+      method:'POST',
+      headers:{...sbH(),Prefer:'return=representation'},
+      body:JSON.stringify(body)
+    });
+    if(r.ok)return{ok:true};
+    if(r.status===409)return{ok:false,msg:'gm_login_nick_taken'};
+    if(r.status===401||r.status===403)return{ok:false,msg:'gm_rls_block'};
+    console.warn('guild_users POST',r.status,await r.text().catch(()=>''));
+    return{ok:false,msg:'gm_login_verify_fail'};
+  }catch(e){
+    console.warn('guild_users POST error',e);
+    return{ok:false,msg:'gm_login_verify_fail'};
+  }
+}
+async function ensureGuildUserProfile(){
+  if(!cloudNick)return false;
+  const ip=await getClientIp();
+  if(!ip)return false;
+  const key=nickKey(cloudNick);
+  const row=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(key)}`);
+  if(row)return row.ip===ip;
+  const gate=await verifyLoginAllowed(cloudNick,ip);
+  if(!gate.ok)return false;
+  if(gate.existing)return false;
+  const reg=await registerGuildUser(cloudNick,ip,cloudGuildTag);
+  return reg.ok;
+}
+async function touchGuildUser(nick,ip,guildTag){
+  const key=nickKey(nick);
+  const body={
+    guild_tag:(guildTag||'').trim()||null,
+    nick_display:(nick||'').trim(),
+    updated_at:new Date().toISOString()
+  };
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(key)}&ip=eq.${encodeURIComponent(ip)}`,{
+      method:'PATCH',
+      headers:sbH(),
+      body:JSON.stringify(body)
+    });
+    return r.ok;
+  }catch(_){return false;}
+}
+async function verifyCurrentSession(){
+  if(!cloudNick)return true;
+  const ip=await getClientIp();
+  if(!ip)return false;
+  const row=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(nickKey(cloudNick))}`);
+  if(!row)return true;
+  return row.ip===ip;
+}
+async function changeGuildUserNick(oldNick,newNick,ip,guildTag){
+  const oldKey=nickKey(oldNick);
+  const newKey=nickKey(newNick);
+  const display=(newNick||'').trim();
+  if(!newKey)return{ok:false,msg:'gm_profile_nick_required'};
+  if(newKey===oldKey){
+    await touchGuildUser(display,ip,guildTag);
+    return{ok:true};
+  }
+  const taken=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(newKey)}`);
+  if(taken)return{ok:false,msg:'gm_nick_busy'};
+  const me=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(oldKey)}`);
+  if(me&&me.ip!==ip)return{ok:false,msg:'gm_login_nick_taken'};
+  const body={
+    nick_key:newKey,
+    nick_display:display,
+    guild_tag:(guildTag||'').trim()||null,
+    updated_at:new Date().toISOString()
+  };
+  try{
+    if(me){
+      const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(oldKey)}&ip=eq.${encodeURIComponent(ip)}`,{
+        method:'PATCH',headers:sbH(),body:JSON.stringify(body)
+      });
+      if(r.ok)return{ok:true};
+      if(r.status===409)return{ok:false,msg:'gm_nick_busy'};
+      return{ok:false,msg:'gm_login_verify_fail'};
+    }
+    return await registerGuildUser(display,ip,guildTag);
+  }catch(_){return{ok:false,msg:'gm_login_verify_fail'};}
+}
+function listingFromBannedUser(l){
+  return isNickBanned(l?.nick)||isIpBanned(l?.creator_ip);
+}
+async function getClientIp(){
+  if(_cachedClientIp)return _cachedClientIp;
+  const tryJson=async url=>{
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)return null;
+    const j=await r.json();
+    return (j.ip||'').trim()||null;
+  };
+  const tryText=async url=>{
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)return null;
+    return (await r.text()).trim()||null;
+  };
+  const tryCfTrace=async()=>{
+    const r=await fetch('https://www.cloudflare.com/cdn-cgi/trace',{cache:'no-store'});
+    if(!r.ok)return null;
+    const t=await r.text();
+    const m=t.match(/^ip=(.+)$/m);
+    return m?m[1].trim():null;
+  };
+  for(const fn of[
+    ()=>tryJson('https://api64.ipify.org?format=json'),
+    ()=>tryJson('https://api.ipify.org?format=json'),
+    ()=>tryCfTrace(),
+    ()=>tryText('https://api64.ipify.org'),
+    ()=>tryText('https://api.ipify.org'),
+  ]){
+    try{
+      const ip=await fn();
+      if(ip&&ip.length<=45&&/^[\d.a-fA-F:]+$/.test(ip)){_cachedClientIp=ip;return ip;}
+    }catch(_){}
+  }
+  return null;
+}
+async function loadGuildBans(){
+  guildBanNicks=new Set();
+  guildBanIps=new Set();
+  async function parseRows(rows){
+    (Array.isArray(rows)?rows:[]).forEach(x=>{
+      const n=(x.nick||'').trim().toLowerCase();
+      if(n)guildBanNicks.add(n);
+      const ip=(x.ip||'').trim();
+      if(ip)guildBanIps.add(ip);
+    });
+  }
+  try{
+    let r=await fetch(`${SB_URL}/rest/v1/${SB_BANS_TABLE}?select=nick,ip`,{
+      headers:{...sbH(),Accept:'application/json'},
+      cache:'no-store'
+    });
+    if(r.ok){await parseRows(await r.json());return;}
+    r=await fetch(`${SB_URL}/rest/v1/${SB_BANS_TABLE}?select=nick`,{
+      headers:{...sbH(),Accept:'application/json'},
+      cache:'no-store'
+    });
+    if(r.ok)await parseRows(await r.json());
+  }catch(_){}
+}
+function getMarketListings(){return guildListings.filter(l=>!isProfessionListing(l)&&!listingFromBannedUser(l));}
+function getProfessionListings(){return guildListings.filter(l=>isProfessionListing(l)&&!listingFromBannedUser(l));}
+function listingMatchBase(l){return ((l.unique_base_name||'')+'_'+(l.item_name||'')).toUpperCase();}
+/** Do tagów — tylko kod itemu z bazy (np. ARMOR_PLATE_SET1). */
+function categoryBase(l){return (l.unique_base_name||'').toUpperCase();}
+function listingMatchesAnyCategory(base){
+  const b=(base||'').toUpperCase();
+  if(!b.trim())return false;
+  return GM_TAGS.some(tag=>tag.match(b));
+}
+function guildShowQualityInListing(l){
+  return !!(l.unique_base_name&&itemHasQuality(l.unique_base_name,l.tier));
+}
+function guildShowEnchantInListing(l){
+  return !!(l.unique_base_name&&itemHasEnchant(l.unique_base_name));
+}
+function guildQualityPillHtml(quality){
+  const q=quality||'Normal';
+  const cls=QUALITY_CLASS[q]||QUALITY_CLASS.Normal;
+  return `<span class="gm-q-pill ${cls}">${esc(tQ(q))}</span>`;
+}
+function getFilteredGuildListings(){
+  const q=guildSearch.trim().toLowerCase();
+  return getMarketListings().filter(l=>{
+    if(guildFilter==='sell'&&l.order_type!=='sell')return false;
+    if(guildFilter==='buy'&&l.order_type!=='buy')return false;
+    const cbase=categoryBase(l);
+    if(guildTagFilter==='other'){
+      if(cbase&&listingMatchesAnyCategory(cbase))return false;
+      if(!cbase&&!listingMatchBase(l).trim())return false;
+    }else if(guildTagFilter){
+      const tag=GM_TAGS.find(x=>x.id===guildTagFilter);
+      if(tag&&!tag.match(cbase))return false;
+    }else{
+      const tq=guildTagSearch.trim();
+      if(tq){
+        const matchTags=tagsMatchingQuery(tq);
+        if(matchTags.length&&!matchTags.some(tag=>tag.match(cbase)))return false;
+      }
+    }
+    if(!q)return true;
+    const nm=listingDisplayName(l).toLowerCase();
+    const legacy=(l.item_name||'').toLowerCase();
+    const nmEn=(l.item_name_en||'').toLowerCase();
+    const nmPl=(l.item_name_pl||'').toLowerCase();
+    return nm.includes(q)||legacy.includes(q)||nmEn.includes(q)||nmPl.includes(q)||
+           (l.nick||'').toLowerCase().includes(q)||
+           listingGuildTag(l).toLowerCase().includes(q)||
+           (l.note||'').toLowerCase().includes(q)||
+           (l.tier||'').toLowerCase().includes(q)||
+           (gmCityLabel(l.city)||l.city||'').toLowerCase().includes(q);
+  });
+}
+function resetProfForm(){
+  profFormOpen=false;profEditingId=null;guildStatus='';
+  profForm={title:'',item_name:'',unique_base_name:'',tier:'T4',quality:'Normal',enchant:0,note:''};
+}
+function profDisplayTitle(pf){return (pf.title||'').trim();}
+function buildGuildNickCol(l,owner){
+  return`<div class="gm-nick-col">
+    <span class="gm-nick-lbl">${state.lang==='pl'?'Gracz':'Player'}</span>
+    <span class="gm-nick-big">${esc(formatListingNick(l))}</span>
+    ${owner?`<div class="gm-actions" style="margin-top:8px;flex-direction:row;flex-wrap:wrap;justify-content:flex-end">
+      <button type="button" class="btn-add" style="padding:5px 10px;font-size:.78rem" data-gm-edit="${l.id}">${t('gm_edit')}</button>
+      <button type="button" class="btn-rm" style="padding:5px 10px;font-size:.78rem" data-gm-delete="${l.id}">${t('gm_delete')}</button>
+    </div>`:''}
+  </div>`;
+}
+function resetGuildForm(){
+  guildFormOpen=false;guildEditingId=null;guildStatus='';
+  guildForm={order_type:'sell',item_name:'',item_name_pl:'',item_name_en:'',unique_base_name:'',tier:'T4',quality:'Excellent',enchant:0,price:'',qty:1,note:'',city:state.activeCity};
+}
+function guildFiltersActive(){
+  return guildFilter!=='all'||!!guildTagFilter||!!guildSearch.trim()||!!guildTagSearch.trim();
+}
+function clearGuildFilters(){
+  guildFilter='all';guildTagFilter='';guildSearch='';guildTagSearch='';
+}
+function readCachedGuildListings(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(GM_LS_KEY)||'[]');
+    return Array.isArray(cached)?cached:[];
+  }catch{return [];}
+}
+async function fetchGuildMarketFromCloud(){
+  const r=await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?select=*&order=created_at.desc`,{
+    headers:{...sbH(),Accept:'application/json'},
+    cache:'no-store'
+  });
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const data=await r.json();
+  if(!Array.isArray(data))throw new Error('bad json');
+  return data;
+}
+async function loadGuildMarket(){
+  guildLoading=true;
+  const prev=guildListings.length?guildListings.slice():readCachedGuildListings();
+  try{
+    let data=null;
+    for(let attempt=0;attempt<2;attempt++){
+      try{
+        data=await fetchGuildMarketFromCloud();
+        break;
+      }catch(_){
+        if(attempt===0)await new Promise(res=>setTimeout(res,600));
+      }
+    }
+    if(data){
+      guildListings=data;
+      localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
+      if(guildListings.length)nextGuildLocalId=Math.max(nextGuildLocalId,...guildListings.map(x=>+x.id||0))+1;
+      guildCloudOk=true;
+      guildStatus=t('gm_cloud_ok');
+      return true;
+    }
+    guildCloudOk=false;
+    const cached=readCachedGuildListings();
+    if(cached.length){
+      guildListings=cached;
+      guildStatus=t('gm_cloud_fail')+(state.lang==='pl'?` (${cached.length} lokalnie)`:` (${cached.length} local)`);
+    }else if(prev.length){
+      guildListings=prev;
+      guildStatus=t('gm_cloud_fail');
+    }else{
+      guildListings=[];
+      guildStatus=t('gm_cloud_fail');
+    }
+    return false;
+  }finally{guildLoading=false;}
+}
+async function saveGuildListing(payload,isUpdate,id){
+  if(!cloudNick){guildStatus=t('gm_login_required');return false;}
+  if(!(await verifyCurrentSession())){guildStatus=t('gm_session_invalid');return false;}
+  if(isNickBanned(cloudNick)){guildStatus=t('gm_banned');return false;}
+  const clientIp=await getClientIp();
+  if(clientIp&&isIpBanned(clientIp)){guildStatus=t('gm_ip_banned');return false;}
+  payload.nick=cloudNick;
+  const gt=(cloudGuildTag||'').trim();
+  if(gt)payload.guild_tag=gt;
+  payload.note=noteBodyForForm(payload.note||'');
+  payload.updated_at=new Date().toISOString();
+  if(!isUpdate){
+    payload.created_at=payload.updated_at;
+    if(clientIp)payload.creator_ip=clientIp;
+  }else{
+    delete payload.creator_ip;
+  }
+  const softOptional=['guild_tag','item_name_pl','item_name_en'];
+  const savedCreatorIp=payload.creator_ip;
+  async function pushToCloud(body){
+    if(isUpdate&&id!=null){
+      return fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
+    }
+    return fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}`,{
+      method:'POST',headers:{...sbH(),'Prefer':'return=representation'},body:JSON.stringify(body)
+    });
+  }
+  try{
+    let body={...payload};
+    let r=await pushToCloud(body);
+    if(!r.ok&&softOptional.some(k=>body[k]!=null)){
+      body={...payload};
+      softOptional.forEach(k=>delete body[k]);
+      r=await pushToCloud(body);
+    }
+    if(!r.ok&&savedCreatorIp&&!isUpdate){
+      body={...payload};
+      softOptional.forEach(k=>delete body[k]);
+      body.creator_ip=savedCreatorIp;
+      r=await pushToCloud(body);
+    }
+    if(r.ok){
+      await ensureGuildUserProfile();
+      await loadGuildMarket();
+      guildStatus=t('gm_saved');
+      return true;
+    }
+    console.warn('guild_market save',r.status,await r.text().catch(()=>''));
+  }catch(_){}
+  if(isUpdate&&id!=null){
+    const idx=guildListings.findIndex(x=>String(x.id)===String(id));
+    if(idx>=0)guildListings[idx]={...guildListings[idx],...payload};
+  }else{
+    guildListings.unshift({id:nextGuildLocalId++,...payload});
+  }
+  localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
+  guildStatus=t('gm_saved');
+  return true;
+}
+async function deleteGuildListing(id){
+  if(cloudNick&&isNickBanned(cloudNick)){guildStatus=t('gm_banned');return;}
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${id}`,{method:'DELETE',headers:sbH()});
+    if(r.ok){await loadGuildMarket();guildStatus=t('gm_deleted');return;}
+  }catch(_){}
+  guildListings=guildListings.filter(x=>String(x.id)!==String(id));
+  localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
+  guildStatus=t('gm_deleted');
+}
+function buildGuildMarketTab(){
+  if(guildForm.unique_base_name&&(guildForm.item_name_pl||guildForm.item_name_en)){
+    guildForm.item_name=state.lang==='pl'
+      ?(guildForm.item_name_pl||guildForm.item_name_en)
+      :(guildForm.item_name_en||guildForm.item_name_pl);
+  }
+  const gf=guildForm;
+  const filtered=getFilteredGuildListings();
+  const hasItem=!!gf.unique_base_name;
+  const hasGearQ=hasItem&&itemHasQuality(gf.unique_base_name,gf.tier);
+  const hasEnchant=hasItem&&itemHasEnchant(gf.unique_base_name);
+  const previewHtml=hasItem?buildGuildIconHtml(gf,'gm-icon-preview'):'';
+  const previewMeta=hasItem?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+    ${hasGearQ?guildQualityPillHtml(gf.quality):''}
+    ${hasEnchant?`<span style="font-size:.85rem;font-weight:700;color:var(--gold-l)">${esc(gf.tier||'T4')}${gmEncStr(gf.enchant)}</span>`:''}
+  </div>`:'';
+  const formHtml=guildFormOpen?`<div class="gm-form">
+    <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${guildEditingId?t('gm_form_title_edit'):t('gm_form_title_add')}</div>
+    <div class="gm-form-grid">
+      <div class="fg"><div class="fl">${t('gm_type')}</div>
+        <select class="fi" id="gm-order-type">
+          <option value="sell"${gf.order_type==='sell'?' selected':''}>${t('gm_sell')}</option>
+          <option value="buy"${gf.order_type==='buy'?' selected':''}>${t('gm_buy')}</option>
+        </select>
+      </div>
+      <div class="fg"><div class="fl">${t('gm_city')}</div>
+        <select class="fi" id="gm-city">
+          ${GM_CITY_LIST.map(c=>{
+            const ci=GM_CITIES[c];
+            const selCity=gf.city==='HO'?'ANY':(gf.city||state.activeCity);
+            return `<option value="${esc(c)}"${c===selCity?' selected':''}>${ci.icon} ${esc(gmCityLabel(c))}</option>`;
+          }).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('lbl_name')}</div>
+      <div class="search-wrap">
+        <input type="text" class="fi" id="gm-item-search" style="width:100%;max-width:420px"
+          value="${esc(gf.item_name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
+        <div class="search-dd" id="gm-sdd" style="display:none;min-width:340px"></div>
+      </div>
+      ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}${previewMeta}</div>`:''}
+    </div>
+    <div class="gm-form-grid">
+      <div class="fg"><div class="fl">${t('lbl_tier')}</div>
+        <select class="fi" id="gm-tier">
+          ${GM_TIERS.map(tr=>`<option value="${tr}"${tr===gf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+        </select>
+      </div>
+      ${hasGearQ?`<div class="fg"><div class="fl">${t('lbl_quality')}</div>
+        <select class="fi" id="gm-quality">
+          ${QUALITY_KEYS.map(k=>`<option value="${k}"${k===gf.quality?' selected':''}>${tQ(k)}</option>`).join('')}
+        </select>
+      </div>`:''}
+      ${hasEnchant?`<div class="fg"><div class="fl">${t('gm_enchant')}</div>
+        <select class="fi" id="gm-enchant">
+          ${guildEnchantLevels(gf.unique_base_name).map(v=>`<option value="${v}"${+gf.enchant===v?' selected':''}>${esc(gf.tier||'T4')}${gmEncStr(v)}</option>`).join('')}
+        </select>
+      </div>`:''}
+      <div class="fg"><div class="fl">${t('gm_price')}</div>
+        <input type="number" class="fi" id="gm-price" min="0" step="1" value="${esc(String(gf.price))}" placeholder="0">
+      </div>
+      <div class="fg"><div class="fl">${t('gm_qty')}</div>
+        <input type="number" class="fi" id="gm-qty" min="1" step="1" value="${esc(String(gf.qty||1))}">
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_note')}</div>
+      <input type="text" class="fi" id="gm-note" style="width:100%;max-width:520px" value="${esc(noteBodyForForm(gf.note))}" placeholder="">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-add" id="btn-gm-save">${t('gm_save')}</button>
+      <button class="btn-rm" id="btn-gm-cancel">${t('gm_cancel')}</button>
+    </div>
+  </div>`:'';
+  const tagBar=buildGuildTagPanel();
+  const toolbar=`<div class="gm-toolbar">
+    <div class="gm-filters">
+      ${['all','sell','buy'].map(f=>{
+        const lbl=f==='all'?t('gm_all'):f==='sell'?t('gm_sell'):t('gm_buy');
+        return `<button type="button" class="gm-fbtn${guildFilter===f?' active':''}" data-gm-filter="${f}">${lbl}</button>`;
+      }).join('')}
+    </div>
+    <input type="text" class="gm-search" id="gm-search-inp" value="${esc(guildSearch)}" placeholder="${t('gm_search')}">
+    <button type="button" class="btn-add" id="btn-gm-refresh" style="padding:8px 14px;font-size:.82rem">${t('gm_refresh')}</button>
+    <button type="button" class="btn-add" id="btn-gm-add" style="padding:8px 14px;font-size:.82rem"${cloudNick?'':' disabled title="'+esc(t('gm_login_required'))+'"'}>${t('gm_add')}</button>
+  </div>`;
+  const listHtml=filtered.length?filtered.map(l=>{
+    const tc=TIER_C[l.tier]||'#aaa';
+    const hasGearQ=itemHasQuality(l.unique_base_name,l.tier);
+    const showEnc=guildShowEnchantInListing(l);
+    const enc=showEnc?gmEncStr(l.enchant):'';
+    const showQual=guildShowQualityInListing(l);
+    const owner=isGuildOwner(l);
+    const cityKey=l.city==='HO'?'ANY':l.city;
+    const cityData=guildCityInfo(cityKey);
+    const dispName=listingDisplayName(l)||l.tier+' item';
+    return`<div class="gm-card">
+      ${buildGuildIconHtml(l,'gm-icon-lg')}
+      <div class="gm-body">
+        <div class="gm-title">
+          <span class="gm-badge ${l.order_type==='buy'?'buy':'sell'}">${l.order_type==='buy'?t('gm_buy'):t('gm_sell')}</span>
+          ${esc(dispName)}
+        </div>
+        <div class="gm-meta">
+          ${cityData?`<span style="color:${cityData.color}">${cityData.icon} ${esc(gmCityLabel(cityKey))}</span>`:''}
+          <span style="color:${tc}">${l.tier}${showEnc?enc:''}</span>
+          ${showQual?guildQualityPillHtml(l.quality||'Normal'):''}
+          <span class="gm-qty">× ${l.qty||1}</span>
+        </div>
+        <div class="gm-price">${f(l.price)}${state.lang==='pl'?' / szt.':' / pc.'}</div>
+        ${listingNoteText(l)?`<div class="gm-note-text">${esc(listingNoteText(l))}</div>`:''}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:6px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
+      </div>
+      ${buildGuildNickCol(l,owner)}
+    </div>`;
+  }).join(''):(()=>{
+    if(guildFiltersActive()){
+      return `<div class="pn" style="padding:24px;text-align:center">
+        <p style="margin-bottom:12px">${t('gm_no_results')}</p>
+        <button type="button" class="btn-add" id="btn-gm-clear-filters">${t('gm_clear_filters')}</button>
+      </div>`;
+    }
+    return `<div class="pn" style="padding:24px;text-align:center">${t('gm_empty')}</div>`;
+  })();
+  return`<div class="gm-page"><div style="padding:16px">
+    ${toolbar}
+    ${tagBar}
+    ${formHtml}
+    <div class="gm-status" style="${guildCloudOk===false?'color:var(--red)':guildCloudOk===true?'color:var(--green)':''}">${guildLoading?t('gm_loading'):esc(guildStatus)}</div>
+    ${listHtml}
+    <div style="text-align:center;font-size:.72rem;color:var(--muted);padding:16px 0 4px;opacity:.7">${state.lang==='pl'?'Wersja':'Version'}: ${APP_VERSION}</div>
+  </div></div>`;
+}
+function buildProfessionTab(){
+  const pf=profForm;
+  const listings=getProfessionListings();
+  const iconEntry=pf.unique_base_name?pf:null;
+  const previewHtml=iconEntry?buildGuildIconHtml(pf,'gm-icon-preview'):'';
+  const formHtml=profFormOpen?`<div class="gm-form">
+    <div style="font-weight:700;color:var(--gold-l);margin-bottom:12px">${profEditingId?t('gm_prof_form_edit'):t('gm_prof_form_add')}</div>
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('gm_prof_title')}</div>
+      <input type="text" class="fi" id="prof-title" style="width:100%;max-width:520px" value="${esc(pf.title)}" placeholder="${esc(t('gm_prof_title_ph'))}" autocomplete="off">
+    </div>
+    <div class="gm-form-grid" style="margin-bottom:10px">
+      <div class="fg"><div class="fl">${t('lbl_tier')}</div>
+        <select class="fi" id="prof-tier">
+          ${GM_TIERS.map(tr=>`<option value="${tr}"${tr===pf.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><div class="fl">${t('gm_prof_icon')}</div>
+      <div class="search-wrap">
+        <input type="text" class="fi" id="prof-item-search" style="width:100%;max-width:420px"
+          value="${esc(pf.item_name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
+        <div class="search-dd" id="prof-sdd" style="display:none;min-width:340px"></div>
+      </div>
+      ${previewHtml?`<div class="gm-preview-wrap">${previewHtml}</div>`:''}
+    </div>
+    <div class="fg" style="margin-bottom:12px"><div class="fl">${t('gm_prof_note')}</div>
+      <textarea class="fi" id="prof-note" rows="4" style="width:100%;max-width:520px;resize:vertical">${esc(noteBodyForForm(pf.note))}</textarea>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-add" id="btn-prof-save">${t('gm_save')}</button>
+      <button class="btn-rm" id="btn-prof-cancel">${t('gm_cancel')}</button>
+    </div>
+  </div>`:'';
+  const toolbar=`<div class="gm-toolbar">
+    <span style="font-size:.85rem;color:var(--muted);flex:1">${t('gm_prof_toolbar')}</span>
+    <button type="button" class="btn-add" id="btn-gm-refresh" style="padding:8px 14px;font-size:.82rem">${t('gm_refresh')}</button>
+    <button type="button" class="btn-add" id="btn-prof-add" style="padding:8px 14px;font-size:.82rem"${cloudNick?'':' disabled title="'+esc(t('gm_login_required'))+'"'}>${t('gm_prof_add')}</button>
+  </div>`;
+  const listHtml=listings.length?listings.map(l=>{
+    const owner=isGuildOwner(l);
+    const iconHtml=l.unique_base_name?buildGuildIconHtml(l,'gm-icon-lg'):`<div class="gm-icon-wrap gm-icon-plain gm-icon-lg"><span style="font-size:2.8rem">📣</span></div>`;
+    return`<div class="gm-card">
+      ${iconHtml}
+      <div class="gm-body">
+        <div class="gm-title">${esc(l.item_name||'—')}</div>
+        ${listingNoteText(l)?`<div class="gm-note-text" style="margin-top:8px">${esc(listingNoteText(l))}</div>`:''}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:10px">${t('gm_posted')}: ${fmtGuildDate(l.created_at||l.updated_at)}</div>
+      </div>
+      ${buildGuildNickCol(l,owner)}
+    </div>`;
+  }).join(''):`<div class="pn" style="padding:24px;text-align:center">${t('gm_prof_empty')}</div>`;
+  return`<div class="gm-page"><div style="padding:16px">
+    ${toolbar}
+    ${formHtml}
+    <div class="gm-status">${guildLoading?t('gm_loading'):esc(guildStatus)}</div>
+    ${listHtml}
+    <div style="text-align:center;font-size:.72rem;color:var(--muted);padding:16px 0 4px;opacity:.7">${state.lang==='pl'?'Wersja':'Version'}: ${APP_VERSION}</div>
+  </div></div>`;
+}
+const _gmSearchTimer={};
+async function triggerGuildSearch(inp,ddId='gm-sdd',tierId='gm-tier'){
+  const query=inp.value.trim();
+  const dd=document.getElementById(ddId);
+  if(!dd)return;
+  if(query.length<2){dd.style.display='none';return;}
+  dd.style.display='block';
+  dd.innerHTML=`<div class="sdd-msg">${t('search_searching')}</div>`;
+  clearTimeout(_gmSearchTimer.t);
+  _gmSearchTimer.t=setTimeout(async()=>{
+    const tierEl=document.getElementById(tierId);
+    const formTier=tierEl?tierEl.value:(tierId==='prof-tier'?profForm.tier:guildForm.tier);
+    if(!_itemDB)dd.innerHTML=`<div class="sdd-msg">${t('search_loading')}</div>`;
+    const db=await getItemDB();
+    if(!db||!Object.keys(db).length){dd.innerHTML=`<div class="sdd-msg">${t('search_err')}</div>`;return;}
+    const q=query.toLowerCase(),hits=[];
+    for(const [uname,names] of Object.entries(db)){
+      const tm=uname.match(/^T([1-8])_/);
+      if(!tm)continue;
+      const en=(names.en||'').toLowerCase(),pl=(names.pl||'').toLowerCase();
+      if(!en.includes(q)&&!pl.includes(q))continue;
+      const display=state.lang==='pl'?(names.pl||names.en||uname):(names.en||names.pl||uname);
+      const itemTier='T'+tm[1];
+      let score=(en.startsWith(q)||pl.startsWith(q))?2:(en.includes(' '+q)||pl.includes(' '+q))?1:0;
+      if(itemTier===formTier)score+=3;
+      hits.push({uname,display,score,tier:itemTier,names});
+    }
+    if(!hits.length){dd.innerHTML=`<div class="sdd-msg">${t('search_none')}</div>`;return;}
+    hits.sort((a,b)=>b.score-a.score||a.display.localeCompare(b.display,'pl'));
+    dd.innerHTML=hits.slice(0,16).map(h=>{
+      const iUrl=`https://render.albiononline.com/v1/item/${encodeURIComponent(h.uname)}.png`;
+      return`<div class="sdd-item" data-gm-pick="${esc(h.uname)}" data-gm-dname="${esc(h.display)}" data-gm-tier="${esc(h.tier)}">
+        <img src="${iUrl}" alt="" onerror="this.style.display='none'">
+        <span class="sdd-name">${esc(h.display)}</span>
+      </div>`;
+    }).join('');
+    dd.querySelectorAll('.sdd-item').forEach(el=>el.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const uname=el.dataset.gmPick,dname=el.dataset.gmDname;
+      const pickTier=el.dataset.gmTier||formTier;
+      const base=uname.replace(/^T\d+_/,'');
+      const rowHits=hits.find(h=>h.uname===uname);
+      const names=rowHits?.names||{};
+      const plN=(names.pl||names.en||dname).trim();
+      const enN=(names.en||names.pl||dname).trim();
+      if(tierId==='prof-tier'){
+        profForm.item_name=state.lang==='pl'?plN:enN;
+        profForm.unique_base_name=base;
+        profForm.tier=pickTier;
+        if(!itemHasQuality(base,pickTier))profForm.enchant=0;
+      }else{
+        guildForm.item_name_pl=plN;
+        guildForm.item_name_en=enN;
+        guildForm.item_name=state.lang==='pl'?plN:enN;
+        guildForm.unique_base_name=normalizeItemBase(base,pickTier);
+        guildForm.tier=pickTier;
+        syncGuildFormQualityFlags();
+      }
+      inp.value=dname;
+      dd.style.display='none';
+      render();
+    }));
+  },350);
+}
+function readGuildFormFromDom(){
+  const ot=document.getElementById('gm-order-type');
+  const ci=document.getElementById('gm-city');
+  const te=document.getElementById('gm-tier');
+  const qu=document.getElementById('gm-quality');
+  const en=document.getElementById('gm-enchant');
+  const pr=document.getElementById('gm-price');
+  const qt=document.getElementById('gm-qty');
+  const no=document.getElementById('gm-note');
+  const si=document.getElementById('gm-item-search');
+  if(ot)guildForm.order_type=ot.value;
+  if(ci)guildForm.city=ci.value;
+  if(te)guildForm.tier=te.value;
+  if(qu)guildForm.quality=qu.value;
+  if(en)guildForm.enchant=+en.value||0;
+  if(pr)guildForm.price=pr.value;
+  if(qt)guildForm.qty=parseInt(qt.value)||1;
+  if(no)guildForm.note=noteBodyForForm(no.value);
+  if(si&&!guildForm.unique_base_name)guildForm.item_name=si.value;
+}
+function bindGuildMarket(){
+  qsa('[data-gm-main]').forEach(el=>on(el,'click',()=>{
+    const m=el.dataset.gmMain;
+    if(!m||m===guildMainTab)return;
+    guildMainTab=m;
+    guildStatus='';
+    render();
+  }));
+  qsa('[data-gm-tag]').forEach(el=>on(el,'click',()=>{
+    guildTagFilter=el.dataset.gmTag||'';
+    render();
+  }));
+  const tsi=document.getElementById('gm-tag-search-inp');
+  if(tsi){
+    tsi.addEventListener('input',()=>{
+      guildTagSearch=tsi.value;
+      guildTagFilter='';
+      const pos=tsi.selectionStart;
+      clearTimeout(_gmSearchTimer.tag);
+      _gmSearchTimer.tag=setTimeout(()=>{
+        render();
+        requestAnimationFrame(()=>{
+          const n=document.getElementById('gm-tag-search-inp');
+          if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(_){}}
+        });
+      },200);
+    });
+  }
+  qsa('[data-gm-filter]').forEach(el=>on(el,'click',()=>{guildFilter=el.dataset.gmFilter;render();}));
+  const si=document.getElementById('gm-search-inp');
+  if(si){
+    si.addEventListener('input',()=>{
+      guildSearch=si.value;
+      const pos=si.selectionStart;
+      clearTimeout(_gmSearchTimer.filter);
+      _gmSearchTimer.filter=setTimeout(()=>{
+        render();
+        requestAnimationFrame(()=>{
+          const n=document.getElementById('gm-search-inp');
+          if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(_){}}
+        });
+      },250);
+    });
+  }
+  on('btn-gm-refresh','click',async()=>{await loadGuildMarket();render();});
+  on('btn-gm-clear-filters','click',()=>{clearGuildFilters();guildStatus='';render();});
+  on('btn-gm-add','click',()=>{
+    if(!cloudNick){guildStatus=t('gm_login_required');render();return;}
+    resetProfForm();resetGuildForm();guildFormOpen=true;render();
+  });
+  on('btn-prof-add','click',()=>{
+    if(!cloudNick){guildStatus=t('gm_login_required');render();return;}
+    resetGuildForm();resetProfForm();profFormOpen=true;render();
+  });
+  on('btn-prof-cancel','click',()=>{resetProfForm();render();});
+  on('btn-prof-save','click',async()=>{
+    const titleEl=document.getElementById('prof-title');
+    const noteEl=document.getElementById('prof-note');
+    const tierEl=document.getElementById('prof-tier');
+    if(titleEl)profForm.title=titleEl.value;
+    if(noteEl)profForm.note=noteBodyForForm(noteEl.value);
+    if(tierEl)profForm.tier=tierEl.value;
+    const title=profDisplayTitle(profForm);
+    if(!title){guildStatus=t('gm_prof_no_title');render();return;}
+    const hasQ=profForm.unique_base_name?itemHasQuality(profForm.unique_base_name,profForm.tier):false;
+    const payload={
+      order_type:'profession',
+      item_name:title,
+      unique_base_name:profForm.unique_base_name||'',
+      tier:profForm.tier||'T4',
+      quality:hasQ?profForm.quality:'Normal',
+      enchant:hasQ?(+profForm.enchant||0):0,
+      price:0,qty:1,note:profForm.note||'',
+      city:state.activeCity
+    };
+    await saveGuildListing(payload,!!profEditingId,profEditingId);
+    resetProfForm();render();
+  });
+  on('btn-gm-cancel','click',()=>{resetGuildForm();render();});
+  on('btn-gm-save','click',async()=>{
+    readGuildFormFromDom();
+    if(!guildForm.item_name||!guildForm.unique_base_name){guildStatus=t('gm_no_item');render();return;}
+    const hasGearQ=itemHasQuality(guildForm.unique_base_name,guildForm.tier);
+    const hasEnc=itemHasEnchant(guildForm.unique_base_name);
+    const encMax=hasEnc?guildMaxEnchantLevel(guildForm.unique_base_name):0;
+    const encVal=hasEnc?Math.min(encMax,Math.max(0,+guildForm.enchant||0)):0;
+    const plN=(guildForm.item_name_pl||guildForm.item_name||'').trim();
+    const enN=(guildForm.item_name_en||guildForm.item_name||'').trim();
+    const payload={
+      order_type:guildForm.order_type,
+      item_name:plN||enN,
+      item_name_pl:plN,
+      item_name_en:enN,
+      unique_base_name:guildForm.unique_base_name,
+      tier:guildForm.tier,
+      quality:hasGearQ?(guildForm.quality||'Normal'):'Normal',
+      enchant:encVal,
+      price:+guildForm.price||0,
+      qty:+guildForm.qty||1,
+      note:guildForm.note||'',
+      city:guildForm.city||state.activeCity
+    };
+    await saveGuildListing(payload,!!guildEditingId,guildEditingId);
+    resetGuildForm();render();
+  });
+  qsa('[data-gm-edit]').forEach(el=>on(el,'click',()=>{
+    const l=guildListings.find(x=>String(x.id)===String(el.dataset.gmEdit));
+    if(!l||!isGuildOwner(l))return;
+    if(isProfessionListing(l)){
+      resetGuildForm();
+      profEditingId=l.id;
+      profFormOpen=true;
+      guildMainTab='profession';
+      profForm={
+        title:(l.item_name||'').trim(),
+        item_name:'',
+        unique_base_name:l.unique_base_name||'',
+        tier:l.tier||'T4',quality:l.quality||'Normal',enchant:+l.enchant||0,
+        note:listingNoteText(l)
+      };
+    }else{
+      resetProfForm();
+      guildEditingId=l.id;
+      guildFormOpen=true;
+      const hasEnc=itemHasEnchant(l.unique_base_name);
+      guildForm={
+        order_type:l.order_type||'sell',
+        item_name:listingDisplayName(l)||l.item_name||'',
+        item_name_pl:(l.item_name_pl||l.item_name||'').trim(),
+        item_name_en:(l.item_name_en||'').trim(),
+        unique_base_name:l.unique_base_name||'',
+        tier:l.tier||'T4',
+        quality:l.quality||'Excellent',
+        enchant:hasEnc?Math.min(guildMaxEnchantLevel(l.unique_base_name),Math.max(0,+l.enchant||0)):0,
+        price:String(l.price||''),
+        qty:+l.qty||1,
+        note:listingNoteText(l),
+        city:l.city==='HO'?'ANY':(l.city||state.activeCity)
+      };
+    }
+    render();
+  }));
+  qsa('[data-gm-delete]').forEach(el=>on(el,'click',async()=>{
+    if(!confirm(t('gm_confirm_del')))return;
+    await deleteGuildListing(el.dataset.gmDelete);
+    render();
+  }));
+  const gSearch=document.getElementById('gm-item-search');
+  if(gSearch){
+    gSearch.addEventListener('input',()=>{guildForm.item_name=gSearch.value;guildForm.unique_base_name='';triggerGuildSearch(gSearch);});
+    gSearch.addEventListener('focus',()=>{if(gSearch.value.length>=2)triggerGuildSearch(gSearch);});
+    gSearch.addEventListener('blur',()=>setTimeout(()=>{const dd=document.getElementById('gm-sdd');if(dd)dd.style.display='none';},200));
+  }
+  const tierEl=document.getElementById('gm-tier');
+  if(tierEl)tierEl.addEventListener('change',()=>{
+    guildForm.tier=tierEl.value;
+    syncGuildFormQualityFlags();
+    render();
+  });
+  const qualEl=document.getElementById('gm-quality');
+  if(qualEl)qualEl.addEventListener('change',()=>{
+    guildForm.quality=qualEl.value;
+    render();
+  });
+  const encEl=document.getElementById('gm-enchant');
+  if(encEl)encEl.addEventListener('change',()=>{
+    guildForm.enchant=+encEl.value||0;
+    render();
+  });
+  const profTier=document.getElementById('prof-tier');
+  if(profTier)profTier.addEventListener('change',()=>{
+    profForm.tier=profTier.value;
+    if(profForm.unique_base_name&&!itemHasQuality(profForm.unique_base_name,profForm.tier))profForm.enchant=0;
+    render();
+  });
+  const pSearch=document.getElementById('prof-item-search');
+  if(pSearch){
+    pSearch.addEventListener('input',()=>{profForm.item_name=pSearch.value;profForm.unique_base_name='';triggerGuildSearch(pSearch,'prof-sdd','prof-tier');});
+    pSearch.addEventListener('focus',()=>{if(pSearch.value.length>=2)triggerGuildSearch(pSearch,'prof-sdd','prof-tier');});
+    pSearch.addEventListener('blur',()=>setTimeout(()=>{const dd=document.getElementById('prof-sdd');if(dd)dd.style.display='none';},200));
+  }
+}
+
+// ══════════ TRANSLATION HELPERS ══════════
+const t    = k => LANGS[state.lang][k] ?? LANGS.pl[k] ?? k;
+const tType= k => (LANGS[state.lang].type||{})[k] ?? k;
+const tQ   = k => {const idx=QUALITY_KEYS.indexOf(k); return idx>=0?t('qual')[idx]:k;};
+const tMat = m => m==='rune'?t('mat_rune'):m==='soul'?t('mat_soul'):t('mat_relic');
+// Full localized material name: Polish "Runa Adepta", English "Adept's Rune"
+function tMatFull(tier,m){
+  const base=tMat(m); // Runa / Dusza / Relikt  OR  Rune / Soul / Relic
+  if(state.lang==='pl') return `${base} ${TIER_PFX_PL[tier]||TIER_PFX[tier]}`;
+  return `${TIER_PFX[tier]} ${m==='rune'?'Rune':m==='soul'?'Soul':'Relic'}`;
+}
+
+function getMats(){return state.materialsByCity[state.activeCity];}
+function getItems(){return state.itemsByCity[state.activeCity];}
+function setItem(id,fn){const a=state.itemsByCity[state.activeCity];const i=a.findIndex(x=>x.id===id);if(i>=0)fn(a[i]);}
+function getListingCity(l){
+  if(l.city)return l.city;
+  for(const c of CITY_LIST){
+    if((state.itemsByCity[c]||[]).some(i=>i.id===l.itemId))return c;
+  }
+  return null;
+}
+function getCityListings(city){return state.listings.filter(l=>getListingCity(l)===city);}
+
+function newItem(){
+  return {
+    id:nextId++, name:'', icon:'', iconIsUrl:false,
+    uniqueBaseName:'',
+    type:'1h', tier:'T4', quality:'Excellent',
+    prices:{p0:'',p1:'',p2:'',p3:''}, sellOrder:true,
+    qty:1, dailyVol:'', rangeFrom:0, rangeTo:3,
+    inSummary:false, favorite:false,
+  };
+}
+
+// ══════════ CALC ══════════
+function getTaxRate(item){
+  const sale=state.premium?+state.settings.taxPrem:+state.settings.taxNoPrem;
+  const setup=item.sellOrder?+state.settings.setupFee:0;
+  return {sale,setup,total:sale+setup};
+}
+function calcStep(item,step,mats){
+  const bp=parseFloat(item.prices[`p${step}`])||0;
+  const sp=parseFloat(item.prices[`p${step+1}`])||0;
+  if(!bp||!sp)return null;
+  const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+  const N=ti.n, mt=STEP_MAT[step];
+  const mp=parseFloat((mats[item.tier]||{})[mt])||0;
+  const qty=parseInt(item.qty)||1;
+  const tax=getTaxRate(item);
+  const taxAmt=sp*tax.total/100;
+  const matCost=N*mp;
+  const profit=(sp-taxAmt)-bp-matCost;
+  const dv=parseFloat(item.dailyVol)||0;
+  return{step,mt,N,mp,matCost,bp,sp,taxRate:tax.total,taxSale:tax.sale,taxSetup:tax.setup,
+    taxAmt,taxAmtQty:taxAmt*qty,netSell:sp-taxAmt,profit,profitQty:profit*qty,qty,
+    recDaily:dv>0?Math.max(1,Math.round(dv*.2)):null,hasDailyVol:dv>0};
+}
+function calcSummary(item,mats){
+  const from=+item.rangeFrom,to=+item.rangeTo;
+  if(from>=to)return null;
+  const bp=parseFloat(item.prices[`p${from}`])||0;
+  const sp=parseFloat(item.prices[`p${to}`])||0;
+  if(!bp||!sp)return null;
+  const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+  const N=ti.n,qty=parseInt(item.qty)||1;
+  const tax=getTaxRate(item);
+  const mc={rune:0,soul:0,relic:0};
+  let totalMC=0;
+  for(let s=from;s<to;s++){
+    const mt=STEP_MAT[s];const mp=parseFloat((mats[item.tier]||{})[mt])||0;
+    mc[mt]+=N;totalMC+=N*mp;
+  }
+  const taxAmt=sp*tax.total/100,netSell=sp-taxAmt;
+  const profit=netSell-bp-totalMC;
+  const dv=parseFloat(item.dailyVol)||0;
+  return{from,to,N,qty,mc,totalMC,bp,sp,taxRate:tax.total,taxSale:tax.sale,taxSetup:tax.setup,
+    taxAmt,taxAmtQty:taxAmt*qty,netSell,profit,profitQty:profit*qty,
+    totalBuy:bp*qty,totalSell:netSell*qty,totalCost:(bp+totalMC)*qty,
+    recDaily:dv>0?Math.max(1,Math.round(dv*.2)):null,hasDailyVol:dv>0};
+}
+
+// ══════════ FORMAT ══════════
+const f  = n=>(n==null||isNaN(n))?'—':Math.round(n).toLocaleString('pl-PL');
+const fp = n=>(n==null||isNaN(n))?'—':(n>=0?'+':'')+Math.round(n).toLocaleString('pl-PL');
+const esc= s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ══════════ BUILD ══════════
+function buildGuildMainTabs(){
+  return`<div class="gm-main-tabs">
+    <button type="button" class="gm-mtab${guildMainTab==='market'?' active':''}" data-gm-main="market">${t('gm_tab_market')}</button>
+    <button type="button" class="gm-mtab${guildMainTab==='profession'?' active':''}" data-gm-main="profession">${t('gm_tab_profession')}</button>
+  </div>`;
+}
+function buildApp(){
+  const pane=guildMainTab==='profession'?buildProfessionTab():buildGuildMarketTab();
+  document.getElementById('app').innerHTML=
+    '<div id="sticky-top">'+buildHeader()+buildGuildMainTabs()+'</div>'+
+    '<div id="tc"><div class="tab-pane active" style="display:block;padding:0">'+pane+'</div></div>';
+}
+
+function buildHeader(){
+  return`<div id="hdr">
+    <span class="logo-i">🏪</span>
+    <div>
+      <div class="logo-main">${t('main_guild')}</div>
+      <div class="logo-sub">Albion Online · ${APP_VERSION}</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="lang-toggle" style="margin:0">
+        <button type="button" class="lang-btn${state.lang==='pl'?' active':''}" data-lang="pl">Polski</button>
+        <button type="button" class="lang-btn${state.lang==='en'?' active':''}" data-lang="en">English</button>
+      </div>
+      <div id="nick-display" style="display:none;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.82rem;font-weight:600;color:var(--gold-l)">
+        <button type="button" id="btn-profile-edit" style="background:none;border:none;color:var(--gold-l);cursor:pointer;font-size:.78rem;padding:0 4px" title="${esc(t('gm_profile_edit'))}">✏️</button>
+        <button type="button" onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0 0 0 6px;border-left:1px solid var(--border);margin-left:4px" title="Wyloguj">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildCityPanel(){
+  const L=t('lang');
+  return`<div id="city-panel">
+    <div class="city-panel-ttl">
+      <img src="${esc(BRIDGE_IMG)}" alt="" onerror="this.style.display='none'">
+      ${t('city_title')}
+    </div>
+    <div class="city-grid">
+      ${CITY_LIST.map(c=>{
+        const ci=CITIES[c];const cnt=(state.itemsByCity[c]||[]).length;
+        const desc=(LANGS[state.lang].city_desc||{})[c]||c;
+        return`<div class="city-tile${c===state.activeCity?' active':''}" data-ctile="${esc(c)}"
+            style="${c===state.activeCity?`border-color:${ci.color};box-shadow:0 0 14px ${ci.color}44`:''}">
+          <span class="ct-icon">${ci.icon}</span>
+          <span class="ct-name" style="color:${ci.color}">${c}</span>
+          <span class="ct-count">${desc}${cnt?' · '+t('items_count')(cnt):''}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function buildTabs(){
+  const awCount=getCityListings(state.activeCity).length;
+  const tabs=[
+    {id:'items',l:t('tab_items')},
+    {id:'materials',l:t('tab_mats')},
+    {id:'summary',l:t('tab_summary')},
+    {id:'awaiting',l:t('tab_awaiting')+(awCount?` <span style="background:var(--green);color:#000;border-radius:999px;padding:1px 7px;font-size:.7rem;font-weight:700">${awCount}</span>`:'')},
+    {id:'settings',l:t('tab_settings')},
+  ];
+  return`<div id="tabs" style="position:relative;z-index:5">${tabs.map(tb=>`<div class="tab-btn${state.activeTab===tb.id?' active':''}" data-tab="${tb.id}">${tb.l}</div>`).join('')}</div>`;
+}
+
+function buildMaterials(){
+  const mats=getMats(),city=CITIES[state.activeCity];
+  return`<div class="tab-pane${state.activeTab==='materials'?' active':''}">
+    <div class="city-ctx"><span>${city.icon}</span>${t('city_mats')} <strong style="color:${city.color}">${state.activeCity}</strong></div>
+    <div class="mat-grid">
+      ${TIERS.map(tier=>`
+        <div class="mat-card">
+          <div class="mat-card-ttl"><span style="color:${TIER_C[tier]};font-size:1rem">${tier}</span> <span style="color:var(--muted)">(${TIER_PFX[tier]})</span></div>
+          ${MAT_TYPES.map(m=>`
+            <div class="mat-row">
+              <img class="mat-img" src="${matImg(tier,m)}" alt="${m}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <span style="display:none;font-size:2rem">${m==='rune'?'🔷':m==='soul'?'💠':'💎'}</span>
+              <div class="mat-name"><strong>${tMatFull(tier,m)}</strong></div>
+              <input type="number" class="mat-inp" min="0" step="1"
+                data-mat="${esc(tier)}-${m}" value="${esc(mats[tier]?mats[tier][m]:'')}" placeholder="0">
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function buildSettings(){
+  const s=state.settings;
+  return`<div class="tab-pane${state.activeTab==='settings'?' active':''}">
+    <div class="scard">
+      <div class="scard-ttl">${t('lang_lbl')}</div>
+      <div class="lang-toggle">
+        <button class="lang-btn${state.lang==='pl'?' active':''}" data-lang="pl">🇵🇱 Polski</button>
+        <button class="lang-btn${state.lang==='en'?' active':''}" data-lang="en">🇬🇧 English</button>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="scard-ttl">💰 ${state.lang==='pl'?'Podatki':'Taxes'}</div>
+      <div class="s-row"><label>${t('set_tax_no')}</label><input type="number" min="0" max="100" step=".01" data-sett="taxNoPrem" value="${s.taxNoPrem}"><span class="unit">%</span></div>
+      <div class="s-row"><label>${t('set_tax_prem')}</label><input type="number" min="0" max="100" step=".01" data-sett="taxPrem" value="${s.taxPrem}"><span class="unit">%</span></div>
+      <div class="hint">${t('set_tax_hint')}</div>
+    </div>
+    <div class="scard">
+      <div class="scard-ttl">📋 Sell Order</div>
+      <div class="s-row"><label>${t('set_fee')}</label><input type="number" min="0" max="100" step=".01" data-sett="setupFee" value="${s.setupFee}"><span class="unit">%</span></div>
+      <div class="hint">${t('set_fee_hint')}</div>
+    </div>
+    <div class="scard" style="max-width:560px">
+      <div class="scard-ttl">${t('set_n_title')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${Object.entries(ITEM_TYPE_KEYS).map(([k,d])=>`
+          <div class="s-row"><label>${d.emoji} ${tType(k)}</label><strong style="color:var(--gold)">${d.n} ${t('set_per_step')}</strong></div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="scard" style="max-width:460px">
+      <div class="scard-ttl">💾 ${state.lang==='pl'?'Dane – eksport / import':'Data – export / import'}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px">
+          ${state.lang==='pl'
+            ?'Eksportuj swoje dane do pliku JSON. Importuj na innym urządzeniu lub w wersji online.'
+            :'Export your data to a JSON file. Import on another device or the online version.'}
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button id="btn-export-data" style="padding:10px 20px;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s">
+            📥 ${state.lang==='pl'?'Eksportuj dane':'Export data'}
+          </button>
+          <label id="btn-import-data" style="padding:10px 20px;background:var(--s2);border:1.5px solid var(--gold-d);color:var(--gold-l);border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s">
+            📤 ${state.lang==='pl'?'Importuj dane':'Import data'}
+            <input type="file" accept=".json" id="import-file-input" style="display:none">
+          </label>
+        </div>
+        <div id="import-status" style="font-size:.8rem;color:var(--muted);min-height:18px"></div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:.72rem;color:var(--muted);padding:8px 0 4px;opacity:.7">${state.lang==='pl'?'Wersja':'Version'}: ${APP_VERSION}</div>
+  </div>`;
+}
+
+function sortItems(items){
+  const mats=getMats();
+  const {key,dir}=state.sort;
+  if(key==='favorite'){
+    return[...items].sort((a,b)=>{
+      const fa=a.favorite?1:0, fb=b.favorite?1:0;
+      return dir==='asc'?fb-fa:fa-fb;
+    });
+  }
+  if(key==='none')return items;
+  const TIER_ORDER=['T2','T3','T4','T5','T6','T7','T8'];
+  const scored=items.map(item=>{
+    const sum=calcSummary(item,mats);
+    const fee=sum&&item.sellOrder?sum.sp*(state.settings.setupFee/100)*sum.qty:0;
+    const inv=sum?sum.totalMC*sum.qty+sum.bp*sum.qty+fee:0;
+    const roi=inv>0&&sum?sum.profitQty/inv:0;
+    const tierIdx=TIER_ORDER.indexOf(item.tier);
+    return{item,inv,roi,tierIdx};
+  });
+  scored.sort((a,b)=>{
+    let v=0;
+    if(key==='tier')    v=a.tierIdx-b.tierIdx;
+    if(key==='roi')     v=a.roi-b.roi;
+    if(key==='invest')  v=a.inv-b.inv;
+    return dir==='asc'?v:-v;
+  });
+  return scored.map(s=>s.item);
+}
+
+function buildItems(){
+  const pl=state.lang==='pl';
+  const rawItems=getItems(),city=CITIES[state.activeCity];
+  const items=sortItems(rawItems);
+  const {key,dir}=state.sort;
+  const SORTS=[
+    {k:'none',  lpl:'Domyślnie',       len:'Default'},
+    {k:'favorite',lpl:'Ulubione',      len:'Favorites'},
+    {k:'tier',  lpl:'Tier',            len:'Tier'},
+    {k:'roi',   lpl:'Stopa zwrotu',    len:'ROI'},
+    {k:'invest',lpl:'Inwestycja',      len:'Investment'},
+  ];
+  const sortBar=`<div class="sort-bar">
+    <span class="sort-lbl">${pl?'Sortuj:':'Sort:'}</span>
+    ${SORTS.map(s=>`<button class="sort-btn${key===s.k?' active':''}" data-sortkey="${s.k}">
+      ${pl?s.lpl:s.len}${key===s.k?' '+(dir==='asc'?'↑':'↓'):''}
+    </button>`).join('')}
+  </div>`;
+  return`<div class="tab-pane${state.activeTab==='items'?' active':''}">
+    <div class="city-ctx"><span>${city.icon}</span>${t('city_items')} <strong style="color:${city.color}">${state.activeCity}</strong></div>
+    ${sortBar}
+    <div class="items-list">
+      ${items.map(item=>buildItemCard(item)).join('')}
+      <div class="add-btn" id="btn-add">${t('lbl_add')}</div>
+    </div>
+  </div>`;
+}
+
+function buildSummaryTab(){
+  const pl=state.lang==='pl';
+  const active=state.activeTab==='summary';
+  const mats=getMats();
+  const items=getItems().filter(i=>i.inSummary);
+  let totalInvest=0,totalProfit=0;
+  const totalMcByTier={};// {tier:{rune,soul,relic}}
+  const baseItemPills=[];
+  items.forEach(item=>{
+    const sum=calcSummary(item,mats);if(!sum)return;
+    const fee=item.sellOrder?sum.sp*(state.settings.setupFee/100)*sum.qty:0;
+    totalInvest+=sum.totalMC*sum.qty+sum.bp*sum.qty+fee;
+    totalProfit+=sum.profitQty;
+    if(!totalMcByTier[item.tier])totalMcByTier[item.tier]={rune:0,soul:0,relic:0};
+    MAT_TYPES.forEach(m=>{totalMcByTier[item.tier][m]+=(sum.mc[m]||0)*sum.qty;});
+    const tc=TIER_C[item.tier];
+    const iconH=item.iconIsUrl?`<img src="${esc(item.icon)}" style="width:22px;height:22px;object-fit:contain" alt="" onerror="this.style.display='none'">`:'';
+    baseItemPills.push(`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;margin:2px">
+      ${iconH}
+      <span style="font-weight:700;color:${tc}">${sum.qty}×</span>
+      <span style="font-size:.8rem;color:var(--muted)">${esc(item.name||tType(item.type))} <span style="color:${tc}">${item.tier}${ENC[sum.from]}</span></span>
+    </span>`);
+  });
+  // Build materials breakdown HTML with icons per tier
+  const matBreakdown=TIERS.filter(tier=>totalMcByTier[tier]).map(tier=>{
+    const tc=TIER_C[tier];
+    const pills=MAT_TYPES.filter(m=>totalMcByTier[tier][m]>0).map(m=>{
+      const imgUrl=matImg(tier,m);
+      return`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;margin:2px">
+        <img src="${imgUrl}" style="width:20px;height:20px;object-fit:contain" alt="" onerror="this.style.display='none'">
+        <span style="font-weight:700;color:var(--gold-l)">${f(totalMcByTier[tier][m])}×</span>
+        <span style="font-size:.8rem;color:var(--muted)">${tMatFull(tier,m)}</span>
+      </span>`;
+    }).join('');
+    return`<div style="margin-bottom:6px"><span style="font-size:.75rem;font-weight:700;color:${tc};margin-right:6px">${tier}</span>${pills}</div>`;
+  }).join('')||'—';
+  const baseItemsHtml=baseItemPills.length?`<div style="margin-bottom:8px"><span style="font-size:.75rem;font-weight:700;color:var(--muted);margin-right:6px;text-transform:uppercase;letter-spacing:.5px">${pl?'Bazowe itemy':'Base items'}</span><div style="display:flex;flex-wrap:wrap">${baseItemPills.join('')}</div></div>`:'';
+
+  const totals=`<div class="stab-total">
+    <div class="stab-kv"><div class="stab-k">${t('sum_total_invest')}</div><div class="stab-v" style="color:var(--red)">${f(totalInvest)} 💰</div></div>
+    <div class="stab-kv"><div class="stab-k">${t('sum_total_profit')}</div><div class="stab-v ${totalProfit>=0?'pg':'pb'}">${fp(totalProfit)} 💰</div></div>
+    <div class="stab-kv" style="flex:2;min-width:280px"><div class="stab-k">${t('sum_total_mat')}</div><div style="margin-top:4px">${baseItemsHtml}${matBreakdown}</div></div>
+  </div>`;
+  const rows=items.length?items.map(item=>{
+    const sum=calcSummary(item,mats);
+    const from=+item.rangeFrom,to=+item.rangeTo;
+    const tc=TIER_C[item.tier];
+    const finalIconUrl=itemFinalIconUrl(item);
+    const fee=sum&&item.sellOrder?sum.sp*(state.settings.setupFee/100)*sum.qty:0;
+    const inv=sum?sum.totalMC*sum.qty+sum.bp*sum.qty+fee:0;
+    const matPills=MAT_TYPES.filter(m=>sum&&sum.mc[m]>0).map(m=>{
+      const imgUrl=matImg(item.tier,m);
+      return`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px">
+        <img src="${imgUrl}" style="width:22px;height:22px;object-fit:contain" alt="" onerror="this.style.display='none'">
+        <span style="font-weight:700;color:var(--gold-l)">${f(sum.mc[m]*sum.qty)}×</span>
+        <span style="font-size:.78rem;color:var(--muted)">${tMatFull(item.tier,m)}</span>
+      </span>`;
+    }).join('');
+    return`<div class="stab-card">
+      <div class="stab-card-row">
+        ${finalIconUrl?`<div class="stab-card-icon"><img src="${esc(finalIconUrl)}" alt="" onerror="this.parentElement.style.display='none'"></div>`:''}
+        <div class="stab-card-main">
+          <div class="stab-head" style="margin-bottom:8px">
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:1rem;margin-bottom:3px">${esc(item.name||tType(item.type))}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+                <span style="color:${tc};font-weight:600">${item.tier}${ENC[from]}→${item.tier}${ENC[to]}</span>
+                <span class="sum-badge">× ${item.qty} ${pl?'szt.':'units'}</span>
+                <span class="sum-badge">${tQ(item.quality)}</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button class="btn-to-market" data-tomarket="${item.id}">🏪 ${t('btn_to_market')}</button>
+              <button class="btn-rm" data-rmsum="${item.id}">✕</button>
+            </div>
+          </div>
+          ${sum?`<div class="stab-grid" style="margin-bottom:8px">
+            <div class="stab-kv"><div class="stab-k">${pl?'Inwestycja':'Investment'}</div><div class="stab-v" style="color:var(--red)">${f(inv)} 💰</div></div>
+            <div class="stab-kv"><div class="stab-k">${pl?'Zarobek':'Profit'}</div><div class="stab-v ${sum.profitQty>=0?'pg':'pb'}">${fp(sum.profitQty)} 💰</div></div>
+            <div class="stab-kv"><div class="stab-k">${pl?'Cena sprzedaży':'Sell price'}</div><div class="stab-v">${f(sum.sp)} 💰</div></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">${matPills||`<span style="font-size:.8rem;color:var(--muted)">${pl?'brak danych':'no data'}</span>`}</div>`
+          :`<span class="sum-na">${t('fill_prices')}</span>`}
+        </div>
+      </div>
+    </div>`;
+  }).join(''):`<div class="pn" style="padding:24px;text-align:center">${t('sum_tab_empty')}</div>`;
+  return`<div class="tab-pane${active?' active':''}"><div style="padding:16px">${totals}${rows}</div></div>`;
+}
+
+function buildAwaitingTab(){
+  const pl=state.lang==='pl';
+  const active=state.activeTab==='awaiting';
+  const now=Date.now(),day=86400000,week=7*day,month=30*day;
+  const city=state.activeCity;
+  const cityData=CITIES[city];
+  const sh=state.salesHistory;
+  const shCity=sh.filter(s=>s.city===city);
+  // Global stats
+  const pToday=sh.filter(s=>now-s.soldAt<day).reduce((a,s)=>a+s.profit,0);
+  const pWeek =sh.filter(s=>now-s.soldAt<week).reduce((a,s)=>a+s.profit,0);
+  const pMonth=sh.filter(s=>now-s.soldAt<month).reduce((a,s)=>a+s.profit,0);
+  const pAll  =sh.reduce((a,s)=>a+s.profit,0);
+  // City stats
+  const cpToday=shCity.filter(s=>now-s.soldAt<day).reduce((a,s)=>a+s.profit,0);
+  const cpWeek =shCity.filter(s=>now-s.soldAt<week).reduce((a,s)=>a+s.profit,0);
+  const cpMonth=shCity.filter(s=>now-s.soldAt<month).reduce((a,s)=>a+s.profit,0);
+  const cpAll  =shCity.reduce((a,s)=>a+s.profit,0);
+  const statsHtml=`<div class="stats-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="stats-head" style="margin-bottom:0">${t('stats_title')}</div>
+      <button class="btn-rm" id="btn-clear-stats" style="font-size:.78rem;padding:4px 10px">${pl?'🗑️ Wyczyść statystyki':'🗑️ Clear stats'}</button>
+    </div>
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">${pl?'🌍 Ogólnie':'🌍 Overall'}</div>
+    <div class="stats-grid" style="margin-bottom:12px">
+      <div class="stats-kv"><div class="stats-k">${t('stats_today')}</div><div class="stats-v">${fp(pToday)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_week')}</div><div class="stats-v">${fp(pWeek)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_month')}</div><div class="stats-v">${fp(pMonth)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_all')}</div><div class="stats-v">${fp(pAll)} 💰</div></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:${cityData?.color||'var(--muted)'}">${cityData?.icon||''} ${city}</div>
+      <button class="btn-rm" id="btn-clear-city-stats" style="font-size:.72rem;padding:3px 9px">${pl?'🗑️ Wyczyść miasto':'🗑️ Clear city'}</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stats-kv"><div class="stats-k">${t('stats_today')}</div><div class="stats-v">${fp(cpToday)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_week')}</div><div class="stats-v">${fp(cpWeek)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_month')}</div><div class="stats-v">${fp(cpMonth)} 💰</div></div>
+      <div class="stats-kv"><div class="stats-k">${t('stats_all')}</div><div class="stats-v">${fp(cpAll)} 💰</div></div>
+    </div>
+  </div>`;
+  const listings=getCityListings(city);
+  const totValH=listings.length?`<div class="stab-total">
+    <div class="stab-kv"><div class="stab-k">${t('await_total_value')}</div><div class="stab-v">${f(listings.reduce((a,l)=>a+l.sp*l.qty,0))} 💰</div></div>
+    <div class="stab-kv"><div class="stab-k">${t('await_total_profit')}</div><div class="stab-v ${listings.reduce((a,l)=>a+l.profit,0)>=0?'pg':'pb'}">${fp(listings.reduce((a,l)=>a+l.profit,0))} 💰</div></div>
+  </div>`:'';
+  const listHtml=listings.length?listings.map(l=>{
+    const elapsed=now-l.listedAt;
+    const h=Math.floor(elapsed/3600000),m=Math.floor((elapsed%3600000)/60000);
+    const timeStr=h>0?`${h}h ${m}m`:`${m}m`;
+    const tc=TIER_C[l.tier]||'#aaa';
+    const iconH=l.iconUrl?`<img src="${esc(l.iconUrl)}" style="width:72px;height:72px;object-fit:contain" alt="" onerror="this.style.display='none'">`:esc(l.emoji||'📦');
+    const cityData=l.city?CITIES[l.city]:null;
+    const cityColor=cityData?.color||'var(--muted)';
+    return`<div class="await-card">
+      <div class="await-head">
+        <span style="font-size:1.4rem;line-height:1;flex-shrink:0">${iconH}</span>
+        <div class="await-info">
+          <div class="await-name" style="display:flex;align-items:center;gap:7px">
+            ${esc(l.name)}
+            ${cityData?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:.78rem;font-weight:600;color:${cityColor};background:rgba(0,0,0,.3);border:1px solid ${cityColor}44;border-radius:5px;padding:2px 7px">${cityData.icon} ${esc(l.city)}</span>`:''}
+          </div>
+          <div class="await-sub"><span style="color:${tc}">${l.tier}${l.enc}</span> · × ${l.qty} ${pl?'szt.':'units'} · ${t('listed_at')} ${timeStr} ${pl?'temu':'ago'}</div>
+        </div>
+        <div class="await-nums">
+          <div style="font-size:.85rem;color:var(--muted)">${pl?'Wartość':'Value'}: <strong style="color:var(--text)">${f(l.sp*l.qty)} 💰</strong></div>
+          <div style="font-size:.85rem;color:var(--muted)">${pl?'Zarobek':'Profit'}: <strong class="${l.profit>=0?'pg':'pb'}">${fp(l.profit)} 💰</strong></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="btn-sold" data-sold="${l.id}">✓ ${t('btn_sold')}</button>
+          <button class="btn-rm" data-rmlisting="${l.id}" style="font-size:.78rem;padding:4px 10px">✕ ${pl?'Usuń':'Remove'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join(''):`<div class="pn" style="padding:20px;text-align:center">${t('await_tab_empty')}</div>`;
+  return`<div class="tab-pane${active?' active':''}"><div style="padding:16px">${statsHtml}${totValH}${listHtml}</div></div>`;
+}
+
+function buildItemCard(item){
+  const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+  const icon=item.icon||ti.emoji;
+  const iconH=item.iconIsUrl?`<img src="${esc(item.icon)}" alt="">`:esc(icon);
+  const fromOpts=[0,1,2].map(v=>`<option value="${v}"${v==item.rangeFrom?' selected':''}>${item.tier}${ENC[v]}</option>`).join('');
+  const toOpts=[1,2,3].filter(v=>v>+item.rangeFrom).map(v=>`<option value="${v}"${v==item.rangeTo?' selected':''}>${item.tier}${ENC[v]}</option>`).join('');
+  const tc=TIER_C[item.tier];
+  return`<div class="item-card" data-item="${item.id}">
+    <div class="item-top">
+      <div class="item-icon">${iconH}</div>
+      <div class="item-fields">
+        <div class="fg"><div class="fl">${t('lbl_name')}</div>
+          <div class="search-wrap">
+            <input type="text" class="fi" style="width:180px" data-f="${item.id}-name" data-search-for="${item.id}"
+              value="${esc(item.name)}" placeholder="${t('search_placeholder')}" autocomplete="off">
+            <div class="search-dd" id="sdd-${item.id}" style="display:none"></div>
+          </div>
+        </div>
+        <div class="fg"><div class="fl">${t('lbl_type')}</div>
+          <select class="fi" data-f="${item.id}-type">
+            ${Object.keys(ITEM_TYPE_KEYS).map(k=>`<option value="${k}"${k===item.type?' selected':''}>${ITEM_TYPE_KEYS[k].emoji} ${tType(k)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><div class="fl">${t('lbl_tier')}</div>
+          <select class="fi" data-f="${item.id}-tier">
+            ${TIERS.map(tr=>`<option value="${tr}"${tr===item.tier?' selected':''} style="color:${TIER_C[tr]}">${tr}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><div class="fl">${t('lbl_quality')}</div>
+          <select class="fi" data-f="${item.id}-quality">
+            ${QUALITY_KEYS.map(k=>`<option value="${k}"${k===item.quality?' selected':''}>${tQ(k)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="item-ctrl">
+        <button type="button" class="fav-btn${item.favorite?' on':''}" data-fav="${item.id}" title="${state.lang==='pl'?'Ulubione':'Favorite'}">${item.favorite?'★':'☆'}</button>
+        <label class="so-btn${item.sellOrder?' on':''}">
+          <input type="checkbox" data-f="${item.id}-sellOrder"${item.sellOrder?' checked':''}>
+          📋 ${state.lang==='pl'?'Zlecenie sprzedaży':'Sell Order'}
+        </label>
+        <button class="btn-rm" data-rm="${item.id}">${t('lbl_remove')}</button>
+      </div>
+    </div>
+    <div class="item-body">
+      <div class="range-row">
+        <span class="range-lbl">${t('lbl_range')}</span>
+        <select class="rsel" data-f="${item.id}-rangeFrom">${fromOpts}</select>
+        <span class="arr-big">→</span>
+        <select class="rsel" data-f="${item.id}-rangeTo">${toOpts}</select>
+        <span class="range-info" style="color:${tc};border-color:${tc}44;background:${tc}11">${item.tier}${ENC[item.rangeFrom]} → ${item.tier}${ENC[item.rangeTo]}</span>
+      </div>
+      <div class="prices-row">
+        ${[0,1,2,3].map(i=>`
+          <div class="pg2">
+            <div class="pl"><span class="dot ${ENC_DOTS[i]}" style="background:${ENC_COLS[i]}"></span><span style="color:${ENC_COLS[i]};font-weight:700">${item.tier}${ENC[i]}</span></div>
+            <input type="number" class="pin" min="0" step="1" data-f="${item.id}-p${i}" value="${esc(item.prices['p'+i])}" placeholder="0">
+          </div>
+        `).join('')}
+        <div class="pg2"><div class="pl">${t('lbl_qty')}</div><input type="number" class="pin" min="1" step="1" data-f="${item.id}-qty" value="${item.qty||1}" placeholder="1"></div>
+        <div class="pg2"><div class="pl">${t('lbl_daily')}</div><input type="number" class="pin" min="0" step="1" data-f="${item.id}-dailyVol" value="${esc(item.dailyVol)}" placeholder="0"></div>
+      </div>
+      <div data-results="${item.id}">${buildResults(item)}</div>
+    </div>
+  </div>`;
+}
+
+function buildResults(item){
+  const mats=getMats();
+  const steps=[0,1,2].map(s=>calcStep(item,s,mats));
+  const sum=calcSummary(item,mats);
+  const from=+item.rangeFrom,to=+item.rangeTo;
+  const anyStep=steps.some(Boolean);
+  const showDly=steps.some(s=>s&&s.hasDailyVol);
+  const qty=parseInt(item.qty)||1;
+  const tax=getTaxRate(item);
+  const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+
+  const tableHtml=`<div class="tbl-wrap">
+    <table class="rtbl">
+      <thead><tr>
+        <th>${t('th_step')}</th>
+        <th>${t('th_mat')}</th>
+        <th>${t('th_mat_price')}</th>
+        <th>${t('th_mat_cost')}</th>
+        <th>${t('th_buy')}</th>
+        <th>${t('th_sell')}</th>
+        <th>${t('th_tax_u')} (${tax.sale}%${tax.setup>0?'+'+tax.setup+'%':''})</th>
+        <th>${t('th_tax_t')} ×${qty}</th>
+        <th>${t('th_p_u')}</th>
+        <th>${t('th_p_t')} ${qty}</th>
+        ${showDly?`<th>${t('th_daily')}</th>`:''}
+        <th>${t('th_worth')}</th>
+      </tr></thead>
+      <tbody>
+        ${[0,1,2].map(step=>{
+          const inRange=step>=from&&step<to;
+          const r=steps[step];
+          const sl=`${item.tier}${ENC[step]}→${ENC[step+1]}`;
+          const mimg=`<img src="${matImg(item.tier,STEP_MAT[step])}" alt="" onerror="this.style.display='none'">`;
+          if(!r)return`<tr class="${inRange?'rn':'rdim'}">
+            <td><span class="step-l" style="color:${STEP_COL[step]}">${inRange?'<span class="rdot"></span>':''}${sl}</span></td>
+            <td class="mat-cell">${mimg}<span>${tMat(STEP_MAT[step])}</span></td>
+            <td class="pn">—</td><td class="pn">—</td><td class="pn">—</td><td class="pn">—</td>
+            <td class="pn">—</td><td class="pn">—</td><td class="pn">—</td><td class="pn">—</td>
+            ${showDly?'<td class="pn">—</td>':''}
+            <td><span class="verdict vna">${t('no_data')}</span></td>
+          </tr>`;
+          const g=r.profit>=0;
+          return`<tr class="${inRange?(g?'rg':'rb'):'rdim'}">
+            <td><span class="step-l" style="color:${STEP_COL[step]}">${inRange?'<span class="rdot"></span>':''}${sl}</span></td>
+            <td class="mat-cell">${mimg}<div><span class="mq">${r.N*qty}×</span> ${tMatFull(item.tier,r.mt)}</div></td>
+            <td>${f(r.mp)}</td><td>${f(r.matCost)}</td>
+            <td>${f(r.bp)}</td><td>${f(r.sp)}</td>
+            <td class="pb">${f(r.taxAmt)}</td><td class="pb">${f(r.taxAmtQty)}</td>
+            <td class="${g?'pg':'pb'}">${fp(r.profit)}</td>
+            <td class="${g?'pg':'pb'}">${fp(r.profitQty)}</td>
+            ${showDly?`<td style="color:var(--gold);font-weight:700">${r.recDaily!=null?r.recDaily+t('s_per_day'):'—'}</td>`:''}
+            <td><span class="verdict ${inRange?(g?'vy':'vn'):'vna'}">${inRange?(g?'✓':'✗'):'—'}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  if(!anyStep)return`<div class="pn" style="padding:6px 0">${t('fill_prices')}</div>`;
+  return tableHtml+buildSummary(item,sum);
+}
+
+function buildSummary(item,sum){
+  const from=+item.rangeFrom,to=+item.rangeTo;
+  const pl=state.lang==='pl';
+  if(!sum)return`<div class="sum-card"><span class="sum-na">${t('fill_range')} ${item.tier}${ENC[from]}→${item.tier}${ENC[to]},${t('to_see_sum')}</span></div>`;
+
+  // Separate components
+  const matCostTotal  = sum.totalMC * sum.qty;
+  const baseCostTotal = sum.bp * sum.qty;
+  const setupFeeTotal = item.sellOrder ? sum.sp * (state.settings.setupFee/100) * sum.qty : 0;
+  const salesTaxTotal = sum.sp * (state.premium ? state.settings.taxPrem : state.settings.taxNoPrem) / 100 * sum.qty;
+  const investment    = matCostTotal + baseCostTotal + setupFeeTotal;
+  const grossRevenue  = sum.sp * sum.qty;
+  const netRevenue    = grossRevenue - salesTaxTotal;
+  const totalProfit   = netRevenue - investment;  // = sum.profitQty
+  const roi = investment>0 ? (totalProfit/investment*100) : 0;
+  const roiStr = (roi>=0?'+':'')+roi.toFixed(1)+'%';
+  const g = totalProfit >= 0;
+
+  return`<div class="sum-card">
+    <div class="sum-lines">
+      <div class="sum-line">
+        <span class="sum-line-lbl">${pl?'Koszt materiałów':'Material cost'}</span>
+        <span class="sum-line-val" style="color:var(--red)">−${f(matCostTotal)} 💰</span>
+      </div>
+      <div class="sum-line">
+        <span class="sum-line-lbl">${pl?'Cena bazowych itemów':'Base item cost'}</span>
+        <span class="sum-line-val" style="color:var(--red)">−${f(baseCostTotal)} 💰</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:rgba(100,149,237,.1);border:1px solid rgba(100,149,237,.25);border-radius:8px;padding:8px 12px;margin:4px 0">
+        <span style="flex:1;font-size:.82rem;font-weight:700;color:#7aaeff">${pl?'🔨 Koszt enchantu (item + mat.)':'🔨 Enchant cost (item + mats)'}</span>
+        <span style="font-size:.95rem;font-weight:700;color:#7aaeff">−${f(matCostTotal+baseCostTotal)} 💰</span>
+      </div>
+      ${setupFeeTotal>0?`<div class="sum-line">
+        <span class="sum-line-lbl">${pl?`Podatek wystawienia (${state.settings.setupFee}%)`:`Listing fee (${state.settings.setupFee}%)`}</span>
+        <span class="sum-line-val" style="color:var(--red)">−${f(setupFeeTotal)} 💰</span>
+      </div>`:''}
+      <div class="sum-sep"></div>
+      <div class="sum-invest">
+        <span style="flex:1;font-size:.9rem;font-weight:700;color:var(--muted)">${pl?'💸 INWESTYCJA':'💸 INVESTMENT'}</span>
+        <span style="font-size:1.05rem;font-weight:700;color:var(--red)">${f(investment)} 💰</span>
+      </div>
+      <div class="sum-line" style="margin-top:6px;opacity:.8">
+        <span class="sum-line-lbl" style="font-size:.8rem">${pl?`Podatek od sprzedaży (${state.premium?state.settings.taxPrem:state.settings.taxNoPrem}%) – potrącany z przychodu`:`Sales tax (${state.premium?state.settings.taxPrem:state.settings.taxNoPrem}%) – deducted from revenue`}</span>
+        <span class="sum-line-val" style="color:var(--muted);font-size:.85rem">−${f(salesTaxTotal)} 💰</span>
+      </div>
+    </div>
+    <div class="sum-profit-box ${g?'good':'bad'}" style="margin-top:6px">
+      <div>
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">${pl?'ZAROBEK CAŁKOWITY':'TOTAL PROFIT'}</div>
+        <span class="sum-profit-big ${g?'pg':'pb'}">${fp(totalProfit)} 💰</span>
+        <span style="color:var(--muted);font-size:.82rem;margin-left:6px">${fp(sum.profit)} 💰 ${pl?'/ szt.':'/ unit'}</span>
+        <span style="display:inline-block;margin-left:10px;padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:700;background:${g?'rgba(76,175,80,.15)':'rgba(244,67,54,.15)'};border:1px solid ${g?'rgba(76,175,80,.4)':'rgba(244,67,54,.4)'};color:${g?'var(--green)':'var(--red)'}">${pl?'ROI':'ROI'}: ${roiStr}</span>
+      </div>
+      <span class="verdict ${g?'vy':'vn'}" style="font-size:.88rem;padding:5px 16px">${g?t('s_yes'):t('s_no')}</span>
+      ${sum.hasDailyVol&&sum.recDaily?`<span class="sum-daily">${t('s_daily')} <strong style="color:var(--gold)">${sum.recDaily}</strong>${t('s_per_day')}</span>`:''}
+    </div>
+    <div class="sum-act-row">
+      <button class="btn-add-sum${item.inSummary?' on':''}" data-togglesum="${item.id}">${item.inSummary?t('btn_in_sum'):t('btn_add_sum')}</button>
+      ${item.inSummary?`<button class="btn-to-market" data-tomarket="${item.id}">🏪 ${t('btn_to_market')}</button>`:''}
+      ${item.inSummary&&sum?(()=>{
+        const pl=state.lang==='pl';
+        const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+        const baseIconUrl=itemIconUrl(item);
+        const iconH=baseIconUrl
+          ?`<img src="${esc(baseIconUrl)}" style="width:22px;height:22px;object-fit:contain;vertical-align:middle" alt="" onerror="this.style.display='none'">`
+          :esc(item.icon||ti.emoji);
+        const tc=TIER_C[item.tier];
+        return`<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s2);border:1px solid var(--border);border-radius:7px;font-size:.82rem">
+          ${iconH}
+          <strong style="color:var(--gold-l)">${item.qty||1}×</strong>
+          <span style="color:${tc}">${item.tier}${ENC[item.rangeFrom]}</span>
+          <span style="color:var(--muted)">${esc(item.name||tType(item.type))}</span>
+        </span>`;
+      })():''}
+      ${(()=>{
+        const listings=state.listings.filter(l=>l.itemId===item.id&&getListingCity(l)===state.activeCity);
+        if(!listings.length)return'';
+        const pl=state.lang==='pl';
+        const now=Date.now();
+        return listings.map(l=>{
+          const elapsed=now-l.listedAt;
+          const h=Math.floor(elapsed/3600000),m=Math.floor((elapsed%3600000)/60000);
+          const timeStr=h>0?`${h}h ${m}m`:`${m}m`;
+          return`<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.35);border-radius:8px;font-size:.82rem;color:#4caf50;font-weight:600">
+            ⏳ ${pl?'Oczekuje na sprzedaż':'Awaiting sale'} · ${l.tier}${l.enc} × ${l.qty} · ${timeStr} ${pl?'temu':'ago'}
+          </span>`;
+        }).join('');
+      })()}
+    </div>
+  </div>`;
+}
+
+// ══════════ RENDER ══════════
+function render(){buildApp();bind();updateNickDisplay();savePrefs();}
+function refreshAllResults(){getItems().forEach(i=>refreshOne(i));}
+function refreshOne(item){const el=document.querySelector(`[data-results="${item.id}"]`);if(el)el.innerHTML=buildResults(item);}
+function rebuildCard(item){
+  const old=document.querySelector(`[data-item="${item.id}"]`);if(!old)return;
+  const tmp=document.createElement('div');tmp.innerHTML=buildItemCard(item);
+  const ne=tmp.firstElementChild;old.replaceWith(ne);bindCard(ne);save();
+}
+
+// ══════════ ITEM DATABASE (GitHub CDN, CORS enabled) ══════════
+let _itemDB=null,_itemDBLoading=false,_itemDBWaiters=[];
+async function getItemDB(){
+  if(_itemDB)return _itemDB;
+  if(_itemDBLoading)return new Promise(res=>_itemDBWaiters.push(res));
+  _itemDBLoading=true;
+  const sources=[
+    'https://raw.githubusercontent.com/ao-data/ao-bin-dumps/master/formatted/items.json',
+    'https://raw.githubusercontent.com/broderickhyman/ao-bin-dumps/master/formatted/items.json',
+  ];
+  let raw=null;
+  for(const url of sources){
+    try{const r=await fetch(url);if(r.ok){raw=await r.json();break;}}catch(_){}
+  }
+  _itemDB={};
+  if(Array.isArray(raw)){
+    raw.forEach(item=>{
+      if(!item.UniqueName||!item.LocalizedNames)return;
+      if(item.UniqueName.includes('@'))return; // skip enchanted variants – only base items
+      const en=(item.LocalizedNames['EN-US']||'').trim();
+      const pl=(item.LocalizedNames['PL-PL']||'').trim();
+      if(!en&&!pl)return;
+      _itemDB[item.UniqueName]={en,pl};
+    });
+  }
+  _itemDBLoading=false;
+  _itemDBWaiters.forEach(fn=>fn(_itemDB));
+  _itemDBWaiters=[];
+  return _itemDB;
+}
+
+// ══════════ SEARCH AUTOCOMPLETE ══════════
+const _sTimers={};
+
+async function triggerSearch(inp,itemId){
+  const query=inp.value.trim();
+  const dd=document.getElementById(`sdd-${itemId}`);
+  if(!dd)return;
+  if(query.length<2){dd.style.display='none';return;}
+  dd.style.display='block';
+  dd.innerHTML=`<div class="sdd-msg">${t('search_searching')}</div>`;
+  clearTimeout(_sTimers[itemId]);
+  _sTimers[itemId]=setTimeout(async()=>{
+    const item=getItems().find(i=>i.id===itemId);
+    if(!item)return;
+    if(!_itemDB)dd.innerHTML=`<div class="sdd-msg">${t('search_loading')}</div>`;
+    const db=await getItemDB();
+    if(!db||!Object.keys(db).length){
+      dd.innerHTML=`<div class="sdd-msg">${t('search_err')}</div>`;return;
+    }
+    const q=query.toLowerCase();
+    const tierPfx=item.tier+'_';
+    // Collect ALL matches (no early break), search both en + pl
+    const hits=[];
+    for(const [uname,names] of Object.entries(db)){
+      if(!uname.startsWith(tierPfx))continue;
+      const en=(names.en||'').toLowerCase();
+      const pl=(names.pl||'').toLowerCase();
+      if(!en.includes(q)&&!pl.includes(q))continue;
+      const display=state.lang==='pl'?(names.pl||names.en||uname):(names.en||names.pl||uname);
+      const score=(en.startsWith(q)||pl.startsWith(q))?2:
+                  (en.includes(' '+q)||pl.includes(' '+q))?1:0;
+      hits.push({uname,display,score});
+    }
+    if(!hits.length){dd.innerHTML=`<div class="sdd-msg">${t('search_none')}</div>`;return;}
+    hits.sort((a,b)=>b.score-a.score||a.display.localeCompare(b.display,'pl'));
+    dd.innerHTML=hits.slice(0,16).map(h=>{
+      const iUrl=`https://render.albiononline.com/v1/item/${encodeURIComponent(h.uname)}.png`;
+      return`<div class="sdd-item" data-pick="${esc(h.uname)}" data-dname="${esc(h.display)}" data-iid="${itemId}">
+        <img src="${iUrl}" alt="" onerror="this.style.display='none'">
+        <span class="sdd-name">${esc(h.display)}</span>
+      </div>`;
+    }).join('');
+    dd.querySelectorAll('.sdd-item').forEach(el=>el.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const uniqueName=el.dataset.pick,dname=el.dataset.dname,iid=+el.dataset.iid;
+      const base=uniqueName.replace(/^T\d+_/,'');
+      const autoType=guessItemType(uniqueName);
+      let pickedItem=null;
+      setItem(iid,it=>{
+        it.name=dname;
+        it.uniqueBaseName=base;
+        it.type=autoType;
+        it.icon=itemIconUrl(it); // respects current tier + rangeFrom
+        it.iconIsUrl=true;
+        pickedItem=it;
+      });
+      inp.value=dname;
+      dd.style.display='none';
+      // Full card rebuild since type may have changed
+      if(pickedItem)rebuildCard(pickedItem);
+      else save();
+    }));
+  },350);
+}
+
+// ══════════ LISTING / SELLING ══════════
+function createListing(itemId){
+  const item=getItems().find(i=>i.id===itemId);if(!item)return;
+  const mats=getMats();
+  const sum=calcSummary(item,mats);
+  const ti=ITEM_TYPE_KEYS[item.type]||ITEM_TYPE_KEYS['1h'];
+  const to=+item.rangeTo;
+  const fee=sum&&item.sellOrder?sum.sp*(state.settings.setupFee/100)*sum.qty:0;
+  state.listings.push({
+    id:nextListingId++,
+    listedAt:Date.now(),
+    itemId,
+    city:state.activeCity,
+    name:item.name||tType(item.type),
+    tier:item.tier,
+    enc:ENC[to],
+    sp:sum?sum.sp:0,
+    qty:sum?sum.qty:(parseInt(item.qty)||1),
+    profit:sum?sum.profitQty:0,
+    investment:sum?sum.totalMC*sum.qty+sum.bp*sum.qty+fee:0,
+    iconUrl:itemFinalIconUrl(item)||(item.iconIsUrl?item.icon:null),
+    emoji:!item.iconIsUrl?(item.icon||ti.emoji):null,
+  });
+  // Remove from summary – item is now in "awaiting" state
+  setItem(itemId,it=>{it.inSummary=false;});
+  save();render();
+}
+
+function soldListing(lid){
+  const l=state.listings.find(x=>listingIdMatch(x.id,lid));if(!l)return;
+  state.salesHistory.push({id:l.id,soldAt:Date.now(),listedAt:l.listedAt,name:l.name,tier:l.tier,enc:l.enc,profit:l.profit,qty:l.qty,city:l.city||null});
+  state.listings=state.listings.filter(x=>!listingIdMatch(x.id,lid));
+  // uncheck inSummary on the source item
+  setItem(l.itemId,it=>{it.inSummary=false;});
+  save();render();
+}
+
+// ══════════ BIND ══════════
+function bind(){
+  qsa('[data-lang]').forEach(el=>el.addEventListener('click',()=>{
+    if(state.lang!==el.dataset.lang){state.lang=el.dataset.lang;render();}
+  }));
+  on('btn-profile-edit','click',()=>openProfileModal());
+  bindGuildMarket();
+}
+
+function bindSearchInputs(root){
+  root.querySelectorAll('[data-search-for]').forEach(inp=>{
+    const iid=+inp.dataset.searchFor;
+    inp.addEventListener('input',()=>triggerSearch(inp,iid));
+    inp.addEventListener('focus',()=>{if(inp.value.length>=2)triggerSearch(inp,iid);});
+    inp.addEventListener('blur',()=>setTimeout(()=>{const dd=document.getElementById(`sdd-${iid}`);if(dd)dd.style.display='none';},200));
+  });
+}
+function bindCard(el){
+  el.querySelectorAll('[data-f]').forEach(inp=>{
+    const evts=inp.type==='checkbox'?['change']:['input','change'];
+    evts.forEach(ev=>inp.addEventListener(ev,()=>handleF(inp)));
+  });
+  el.querySelectorAll('[data-fav]').forEach(btn=>on(btn,'click',()=>{
+    const id=+btn.dataset.fav;
+    setItem(id,it=>{it.favorite=!it.favorite;});
+    save();render();
+  }));
+  el.querySelectorAll('[data-rm]').forEach(btn=>on(btn,'click',()=>{
+    state.itemsByCity[state.activeCity]=state.itemsByCity[state.activeCity].filter(i=>i.id!==+btn.dataset.rm);render();
+  }));
+  bindSearchInputs(el);
+}
+
+// Returns the correct icon URL for an item considering tier + rangeFrom enchant level
+function itemIconUrl(item){
+  if(!item.uniqueBaseName)return null;
+  const enc=(+item.rangeFrom)>0?`@${item.rangeFrom}`:'';
+  return`https://render.albiononline.com/v1/item/${encodeURIComponent(item.tier+'_'+item.uniqueBaseName+enc)}.png`;
+}
+// Final product icon (target enchant / rangeTo) — for summary display
+function itemFinalIconUrl(item){
+  if(!item.uniqueBaseName)return item.iconIsUrl&&item.icon?item.icon:null;
+  const enc=(+item.rangeTo)>0?`@${item.rangeTo}`:'';
+  return`https://render.albiononline.com/v1/item/${encodeURIComponent(item.tier+'_'+item.uniqueBaseName+enc)}.png`;
+}
+
+// Auto-detect item type from Albion unique name
+function guessItemType(uname){
+  const b=uname.replace(/^T\d+_/,'');
+  if(b.startsWith('2H_'))return '2h';
+  if(b.startsWith('GATHERER_HEADGEAR')||b.startsWith('GATHERER_HEAD'))return 'g_helm';
+  if(b.startsWith('GATHERER_ARMOR'))return 'g_armor';
+  if(b.startsWith('GATHERER_SHOES'))return 'g_boots';
+  if(b.startsWith('GATHERER_BACKPACK'))return 'g_bag';
+  if(b.startsWith('HEAD_'))return 'helm';
+  if(b.startsWith('ARMOR_'))return 'armor';
+  if(b.startsWith('SHOES_'))return 'boots';
+  if(b.startsWith('BAG'))return 'bag';
+  if(b.startsWith('CAPE'))return 'cape';
+  if(b.startsWith('OFF_'))return 'offhand';
+  // 1H: MAIN_*, single staffs, daggers, etc.
+  return '1h';
+}
+
+function handleF(el){
+  const parts=el.dataset.f.split('-'),id=+parts[0],field=parts.slice(1).join('-');
+  let item=null;setItem(id,i=>{item=i;});if(!item)return;
+  let needCard=false;
+  switch(field){
+    case 'name':      item.name=el.value;save();return;
+    case 'quality':   item.quality=el.value;break;
+    case 'sellOrder': item.sellOrder=el.checked;
+      {const btn=el.closest('.so-btn');if(btn)btn.classList.toggle('on',item.sellOrder);}
+      break;
+    case 'qty':       item.qty=parseInt(el.value)||1;break;
+    case 'dailyVol':  item.dailyVol=el.value;break;
+    case 'p0': item.prices.p0=el.value;break;
+    case 'p1': item.prices.p1=el.value;break;
+    case 'p2': item.prices.p2=el.value;break;
+    case 'p3': item.prices.p3=el.value;break;
+    case 'type': item.type=el.value;needCard=true;break;
+    case 'tier': item.tier=el.value;
+      if(item.uniqueBaseName){item.icon=itemIconUrl(item);item.iconIsUrl=true;}
+      needCard=true;break;
+    case 'rangeFrom': item.rangeFrom=+el.value;
+      if(+item.rangeTo<=+item.rangeFrom)item.rangeTo=Math.min(3,+item.rangeFrom+1);
+      if(item.uniqueBaseName){item.icon=itemIconUrl(item);item.iconIsUrl=true;}
+      needCard=true;break;
+    case 'rangeTo': item.rangeTo=+el.value;needCard=true;break;
+  }
+  if(needCard){rebuildCard(item);return;}
+  refreshOne(item);save();
+}
+
+// ══════════ UTILS ══════════
+const qsa=s=>document.querySelectorAll(s);
+function on(e,ev,fn){const el=typeof e==='string'?document.getElementById(e):e;if(el)el.addEventListener(ev,fn);}
+
+// ══════════ PERSIST ══════════
+function persistState(){
+  try{localStorage.setItem('ao_ec_v7',JSON.stringify({
+    lang:state.lang,premium:state.premium,activeCity:state.activeCity,activeTab:state.activeTab,mainSection:state.mainSection,
+    materialsByCity:state.materialsByCity,settings:state.settings,itemsByCity:state.itemsByCity,nextId,
+    listings:state.listings,salesHistory:state.salesHistory,sort:state.sort,
+    nextListingId,
+    updated_at_ts:Date.now()
+  }));}catch(_){}
+}
+function save(){savePrefs();}
+
+// ══════════ EXPORT / IMPORT ══════════
+// ══════════ SUPABASE (tylko guild_market) ══════════
+const SB_URL  = 'https://evusmbdcaxnuuetaqhkx.supabase.co';
+const SB_KEY  = 'sb_publishable_4Z0G4g1lFUnaV9vk5Kaoww_tLbKr0B_';
+let cloudNick = localStorage.getItem('ao_nick')||null;
+let cloudGuildTag = (localStorage.getItem('ao_guild_tag')||'').trim();
+
+function sbH(){
+  return{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+}
+
+// ── LOGIN MODAL ──
+function buildLoginModal(){
+  return`<div id="login-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(6px)">
+    <div style="background:var(--s1);border:2px solid var(--gold-d);border-radius:18px;padding:36px 32px;width:92%;max-width:400px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8)">
+      <div style="font-size:3rem;margin-bottom:10px">🏪</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold-l);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">${t('main_guild')}</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:24px">${state.lang==='pl'?'Podaj nick z Albion Online lub Discorda — wymagany do dodawania i edycji ogłoszeń.':'Enter your Albion Online or Discord nick — required to post and edit listings.'}</div>
+      <input id="nick-input" type="text" placeholder="Twój nick..." autocomplete="off" spellcheck="false"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:1rem;text-align:center;margin-bottom:8px;outline:none">
+      <div style="font-size:.75rem;color:var(--muted);text-align:left;margin-bottom:4px">${t('gm_guild_tag')}</div>
+      <input id="guild-tag-input" type="text" value="${esc(cloudGuildTag)}" placeholder="${esc(t('gm_guild_tag_ph'))}" autocomplete="off" spellcheck="false" maxlength="12"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:10px 16px;font-size:.95rem;text-align:center;margin-bottom:8px;outline:none;text-transform:uppercase">
+      <div id="nick-status" style="font-size:.8rem;color:var(--muted);min-height:20px;margin-bottom:14px"></div>
+      <button id="nick-confirm" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-d),#8a6a25);border:none;border-radius:10px;color:var(--gold-l);font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.5px">
+        ${state.lang==='pl'?'Wejdź na rynek →':'Enter market →'}
+      </button>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:14px">${state.lang==='pl'?'Nick rezerwuje profil na tym urządzeniu. Z jednego urządzenia — jeden nick.':'Your nick reserves a profile on this device. One device — one nick.'}</div>
+    </div>
+  </div>`;
+}
+
+function persistProfile(nick,guildTag){
+  nick=(nick||'').trim();
+  guildTag=(guildTag||'').trim();
+  localStorage.setItem('ao_nick',nick);
+  cloudNick=nick;
+  cloudGuildTag=guildTag;
+  if(guildTag)localStorage.setItem('ao_guild_tag',guildTag);
+  else localStorage.removeItem('ao_guild_tag');
+}
+async function syncListingsProfile(oldNick,newNick,newTag){
+  const oldL=(oldNick||'').trim().toLowerCase();
+  if(!oldL)return;
+  const patch={nick:newNick.trim()};
+  if(newTag)patch.guild_tag=newTag;
+  else patch.guild_tag=null;
+  const mine=guildListings.filter(l=>(l.nick||'').toLowerCase()===oldL);
+  for(const l of mine){
+    const noteBody=listingNoteText(l);
+    l.nick=patch.nick;
+    if(newTag)l.guild_tag=newTag; else delete l.guild_tag;
+    l.note=noteBody;
+    try{
+      let body={nick:patch.nick,note:l.note,updated_at:new Date().toISOString()};
+      if(newTag)body.guild_tag=newTag;
+      let r=await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
+      if(!r.ok&&body.guild_tag!=null){
+        body={nick:patch.nick,note:l.note,updated_at:body.updated_at};
+        await fetch(`${SB_URL}/rest/v1/${SB_GUILD_TABLE}?id=eq.${l.id}`,{method:'PATCH',headers:sbH(),body:JSON.stringify(body)});
+      }
+    }catch(_){}
+  }
+  localStorage.setItem(GM_LS_KEY,JSON.stringify(guildListings));
+  try{await loadGuildMarket();}catch(_){}
+}
+function buildProfileModal(){
+  return`<div id="profile-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(6px)">
+    <div style="background:var(--s1);border:2px solid var(--gold-d);border-radius:18px;padding:32px 28px;width:92%;max-width:400px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8)">
+      <div style="font-size:1.1rem;font-weight:700;color:var(--gold-l);margin-bottom:18px">${t('gm_profile_title')}</div>
+      <div style="font-size:.75rem;color:var(--muted);text-align:left;margin-bottom:4px">${state.lang==='pl'?'Nick':'Nick'}</div>
+      <input id="profile-nick-input" type="text" value="${esc(cloudNick||'')}" autocomplete="off" spellcheck="false"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:1rem;text-align:center;margin-bottom:10px;outline:none">
+      <div style="font-size:.75rem;color:var(--muted);text-align:left;margin-bottom:4px">${t('gm_guild_tag')}</div>
+      <input id="profile-tag-input" type="text" value="${esc(cloudGuildTag||'')}" placeholder="${esc(t('gm_guild_tag_ph'))}" autocomplete="off" spellcheck="false" maxlength="12"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:10px 16px;font-size:.95rem;text-align:center;margin-bottom:8px;outline:none;text-transform:uppercase">
+      <div id="profile-status" style="font-size:.8rem;color:var(--muted);min-height:20px;margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="profile-save" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--gold-d),#8a6a25);border:none;border-radius:10px;color:var(--gold-l);font-size:.95rem;font-weight:700;cursor:pointer">${t('gm_profile_save')}</button>
+        <button id="profile-cancel" class="btn-rm" style="flex:1;padding:12px;border-radius:10px">${t('gm_cancel')}</button>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:12px;text-align:left">${state.lang==='pl'?'Zmiana nicku zaktualizuje też Twoje ogłoszenia na liście (w tej przeglądarce i w bazie, jeśli połączenie działa).':'Changing your nick also updates your listings here and in the database when online.'}</div>
+    </div>
+  </div>`;
+}
+function closeProfileModal(){
+  const ov=document.getElementById('profile-overlay');
+  if(ov)ov.remove();
+}
+function bindProfileModal(){
+  const inp=document.getElementById('profile-nick-input');
+  const tag=document.getElementById('profile-tag-input');
+  const save=document.getElementById('profile-save');
+  const cancel=document.getElementById('profile-cancel');
+  const status=document.getElementById('profile-status');
+  if(inp)inp.focus();
+  if(cancel)cancel.addEventListener('click',closeProfileModal);
+  const runSave=async()=>{
+    const newNick=(inp?inp.value:'').trim();
+    const newTag=(tag?tag.value:'').trim();
+    if(!newNick){
+      if(status){status.style.color='var(--red)';status.textContent=t('gm_profile_nick_required');}
+      return;
+    }
+    const oldNick=cloudNick;
+    if(save)save.disabled=true;
+    const ip=await getClientIp();
+    if(!ip){
+      if(status){status.style.color='var(--red)';status.textContent=t('gm_login_verify_fail');}
+      if(save)save.disabled=false;
+      return;
+    }
+    const ch=await changeGuildUserNick(oldNick,newNick,ip,newTag);
+    if(!ch.ok){
+      if(status){status.style.color='var(--red)';status.textContent=t(ch.msg||'gm_login_verify_fail');}
+      if(save)save.disabled=false;
+      return;
+    }
+    persistProfile(newNick,newTag);
+    await syncListingsProfile(oldNick,newNick,newTag);
+    closeProfileModal();
+    guildStatus=t('gm_profile_updated');
+    render();
+    updateNickDisplay();
+  };
+  if(save)save.addEventListener('click',runSave);
+  if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter')runSave();});
+}
+function openProfileModal(){
+  closeProfileModal();
+  document.body.insertAdjacentHTML('beforeend',buildProfileModal());
+  bindProfileModal();
+}
+async function doLogin(nick,guildTag){
+  nick=nick.trim();
+  guildTag=(guildTag||'').trim();
+  const s=document.getElementById('nick-status');
+  if(!nick)return;
+  await loadGuildBans();
+  if(isNickBanned(nick)){
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_banned');}
+    return;
+  }
+  const btn=document.getElementById('nick-confirm');
+  if(btn)btn.disabled=true;
+  const ip=await getClientIp();
+  if(!ip){
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_login_no_ip');}
+    if(btn)btn.disabled=false;
+    return;
+  }
+  if(isIpBanned(ip)){
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_banned');}
+    if(btn)btn.disabled=false;
+    return;
+  }
+  const gate=await verifyLoginAllowed(nick,ip);
+  if(!gate.ok){
+    if(s){s.style.color='var(--red)';s.textContent=t(gate.msg||'gm_login_verify_fail');}
+    if(btn)btn.disabled=false;
+    return;
+  }
+  if(!gate.existing){
+    const reg=await registerGuildUser(nick,ip,guildTag);
+    if(!reg.ok){
+      if(s){s.style.color='var(--red)';s.textContent=t(reg.msg||'gm_login_verify_fail');}
+      if(btn)btn.disabled=false;
+      return;
+    }
+  }else{
+    await touchGuildUser(nick,ip,guildTag);
+  }
+  const rowAfter=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(nickKey(nick))}`);
+  if(!rowAfter){
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_rls_block');}
+    if(btn)btn.disabled=false;
+    return;
+  }
+  if(rowAfter.ip!==ip){
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_login_nick_taken');}
+    if(btn)btn.disabled=false;
+    return;
+  }
+  persistProfile(nick,guildTag);
+  const ov=document.getElementById('login-overlay');
+  if(ov)ov.remove();
+  await loadGuildMarket();
+  render();
+  updateNickDisplay();
+}
+
+function updateNickDisplay(){
+  const el=document.getElementById('nick-display');
+  if(!el||!cloudNick)return;
+  // Insert nick text before the logout button
+  let span=el.querySelector('.nick-txt');
+  if(!span){span=document.createElement('span');span.className='nick-txt';el.insertBefore(span,el.firstChild);}
+  span.textContent='👤 '+formatListingNick({nick:cloudNick,guild_tag:cloudGuildTag});
+  el.style.display='flex';
+}
+
+function logout(){
+  const pl=state.lang==='pl';
+  if(!confirm(pl?'Wylogować się? (bez nicku nie dodasz ogłoszeń)':'Log out? (you need a nick to post listings)'))return;
+  localStorage.removeItem('ao_nick');
+  cloudNick=null;
+  cloudGuildTag=(localStorage.getItem('ao_guild_tag')||'').trim();
+  // Show login overlay
+  document.body.insertAdjacentHTML('beforeend',buildLoginModal());
+  bindLoginModal();
+}
+
+function bindLoginModal(){
+  const inp=document.getElementById('nick-input');
+  const btn=document.getElementById('nick-confirm');
+  if(inp){
+    inp.focus();
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const tg=document.getElementById('guild-tag-input');
+        doLogin(inp.value,tg?tg.value:'');
+      }
+    });
+    inp.addEventListener('input',()=>{
+      const s=document.getElementById('nick-status');
+      if(s)s.textContent='';
+    });
+  }
+  if(btn)btn.addEventListener('click',()=>{
+    const tg=document.getElementById('guild-tag-input');
+    doLogin(inp?inp.value:'',tg?tg.value:'');
+  });
+}
+
+// ══════════ INIT ══════════
+try{
+if(ensureFreshHtmlVersion()){/* reload */}else{
+loadPrefs();
+(async()=>{
+  await Promise.all([loadGuildMarket(),loadGuildBans()]);
+  if(cloudNick&&isNickBanned(cloudNick)){
+    localStorage.removeItem('ao_nick');
+    cloudNick=null;
+    document.body.insertAdjacentHTML('beforeend',buildLoginModal());
+    bindLoginModal();
+    const s=document.getElementById('nick-status');
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_banned');}
+  }else if(cloudNick&&!(await verifyCurrentSession())){
+    localStorage.removeItem('ao_nick');
+    cloudNick=null;
+    document.body.insertAdjacentHTML('beforeend',buildLoginModal());
+    bindLoginModal();
+    const s=document.getElementById('nick-status');
+    if(s){s.style.color='var(--red)';s.textContent=t('gm_session_invalid');}
+  }
+  getItemDB().then(()=>render());
+  render();
+  if(cloudNick){
+    await ensureGuildUserProfile();
+    updateNickDisplay();
+  } else if(!document.getElementById('login-overlay')) {
+    document.body.insertAdjacentHTML('beforeend',buildLoginModal());
+    bindLoginModal();
+  }
+})();
+}
+}catch(err){
+  console.error(err);
+  document.body.innerHTML='<div style="max-width:520px;margin:40px auto;padding:24px;background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;color:#e8e8f0;font-family:sans-serif"><h2 style="color:#ffd700;margin:0 0 12px">Błąd ładowania</h2><p style="margin:0 0 10px">Rynek gildii nie mógł się uruchomić. Odśwież stronę (Ctrl+Shift+R).</p><p style="margin:0;font-size:.85rem;color:#aaa">'+String(err&&err.message||err)+'</p></div>';
+}
+
+window.addEventListener('pageshow',e=>{
+  if(e.persisted)loadGuildMarket().then(()=>render());
+});
+window.addEventListener('scroll',()=>{
+  const scrolled=window.scrollY>300;
+  const atBottom=window.scrollY+window.innerHeight>=document.body.scrollHeight-100;
+  const btnT=document.getElementById('btn-top');
+  const btnB=document.getElementById('btn-bot');
+  if(btnT)btnT.classList.toggle('vis',scrolled);
+  if(btnB)btnB.classList.toggle('vis',!atBottom&&document.body.scrollHeight>window.innerHeight+200);
+},{passive:true});
+</script>
+</body>
+</html>
