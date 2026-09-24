@@ -518,7 +518,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-14';
+const APP_VERSION = 'rynek-gildii-15';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -696,26 +696,31 @@ const GM_TAGS=[
   {id:'weapon_1h',pl:'Broń jednoręczna (1H)',en:'One-handed (1H)',keys:['1h','jednoręcz','main hand'],match:b=>/^MAIN_/.test(b)&&!/SHIELD/.test(b)},
   {id:'w_hammer',pl:'Młoty',en:'Hammers',keys:['młot','hammer','gavel','morningstar'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/HAMMER|GAVEL|MORNINGSTAR/i.test(b)&&!/MACE/i.test(b)},
   {id:'w_mace',pl:'Buławy',en:'Maces',keys:['buława','mace','flail'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/MACE|FLAIL|CLAWS_MACE/i.test(b)&&!/HAMMER|GAVEL/i.test(b)},
-  {id:'w_bow',pl:'Łuki / kusze',en:'Bows / crossbows',keys:['łuk','bow','kusza','crossbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/BOW|CROSSBOW/i.test(b)},
+  {id:'w_bow',pl:'Łuki',en:'Bows',keys:['łuk','bow','longbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/BOW/i.test(b)&&!/CROSSBOW/i.test(b)},
+  {id:'w_crossbow',pl:'Kusze',en:'Crossbows',keys:['kusza','crossbow'],match:b=>/^MAIN_|^2H_/.test(b)&&/CROSSBOW/i.test(b)},
   {id:'w_staff_holy',pl:'Święte kostury',en:'Holy staves',keys:['święt','holy','kostur św'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&(/HOLYSTAFF|HOLY_STAFF|HOLY_SCEPTER|HOLY_WAND/i.test(b)||(/HOLY/i.test(b)&&/STAFF|SCEPTER|WAND/i.test(b)))},
   {id:'w_staff_morph',pl:'Kostury zmiennokształtne',en:'Shapeshifter staves',keys:['zmiennokształt','shapeshift','transform'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/SHAPESHIFT/i.test(b)},
-  {id:'w_staff_quarter',pl:'Kije (quarterstaff)',en:'Quarterstaffs',keys:['kij','quarterstaff'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/QUARTERSTAFF/i.test(b)},
+  {id:'w_staff_quarter',pl:'Kije',en:'Quarterstaffs',keys:['kij','quarterstaff','kij bojowy'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/QUARTERSTAFF/i.test(b)},
   {id:'w_staff',pl:'Kostury / różdżki',en:'Staves / wands',keys:['kostur','staff','laska','wand','scepter'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/STAFF|SCEPTER|WAND/i.test(b)&&!/HAMMER|MACE|GAVEL|QUARTERSTAFF|HOLY|SHAPESHIFT/i.test(b)},
   {id:'w_sword',pl:'Miecze',en:'Swords',keys:['miecz','sword','sabre','rapier'],match:b=>/^MAIN_|^2H_/.test(b)&&/SWORD|SABRE|CLAYMORE|BROADSWORD|RAPIER|CARVING/i.test(b)},
   {id:'w_axe',pl:'Topory',en:'Axes',keys:['topor','axe','cleaver'],match:b=>/^MAIN_|^2H_/.test(b)&&/AXE|CHOPPER|CLEAVER|BEARPAW|CARVE/i.test(b)&&!/PICKAXE/i.test(b)},
   {id:'w_spear',pl:'Włócznie / halabardy',en:'Spears / halberds',keys:['włócz','spear','pike','halberd','trident'],match:b=>/^MAIN_|^2H_/.test(b)&&/SPEAR|PIKE|HALBERD|TRIDENT|GLAIVE|SPIKED/i.test(b)},
-  {id:'w_dagger',pl:'Sztylety / claw',en:'Daggers / claws',keys:['sztylet','dagger','claw','dual','pięści'],match:b=>/^MAIN_|^2H_/.test(b)&&/DAGGER|CLAW|DUAL|KNUCKLE|FIST/i.test(b)},
+  {id:'w_dagger',pl:'Sztylety / szpony',en:'Daggers / claws',keys:['sztylet','dagger','claw','dual','pięści','szpon'],match:b=>/^MAIN_|^2H_/.test(b)&&/DAGGER|CLAW|DUAL|KNUCKLE|FIST/i.test(b)},
   {id:'w_arcane',pl:'Broń magiczna',en:'Magic weapons',keys:['magia','arcane','fire','frost','nature','curse','kląt'],match:b=>/^MAIN_|^2H_/.test(b)&&!/SHIELD/.test(b)&&/(CURSED|FIRE|FROST|NATURE|ARCANE)/i.test(b)&&!/HOLY|SHAPESHIFT/i.test(b)&&!/^(HEAD_|ARMOR_|SHOES_)/.test(b)},
-  {id:'cook',pl:'Gotowanie (jedzenie)',en:'Cooking (food)',keys:['gotow','kuchn','jedzen','food','meal'],match:b=>/FOOD|MEAL|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|AVALONIAN|BEAN|CABBAGE|WORM/i.test(b)&&!/POTION|POISON|SKILLBOOK/i.test(b)},
-  {id:'potions',pl:'Potki / trucizny',en:'Potions / poisons',keys:['potka','potion','trucizn','poison'],match:b=>/POTION|POISON/i.test(b)},
+  {id:'food',pl:'Jedzenie',en:'Food',keys:['jedzen','food','meal','potraw','chleb','bread'],match:b=>!/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b)&&/MEAL_|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|GRILLEDFISH|BREAD|AVALONIAN.*MEAL/i.test(b)&&!/POTION|POISON|SKILLBOOK|FISHSAUCE|FISHCHOPS|_SEED/i.test(b)},
+  {id:'cook_mats',pl:'Składniki gotowania',en:'Cooking ingredients',keys:['składnik','gotow','kuchn','ziarno','seed','ryba surow','sos rybny'],match:b=>{
+    if(/^(MAIN_|2H_|OFF_|HEAD_|ARMOR_|SHOES_|GATHERER_)/.test(b))return false;
+    if(/POTION|POISON|SKILLBOOK|MEAL_|OMELETTE|SANDWICH|STUFFED|CASSEROLE|SOUP|PIE|ROAST|STEW|GRILLEDFISH/i.test(b))return false;
+    if(/FARM_|_SEED|CARROT|WHEAT|BEAN|CABBAGE|WORM|TURNIP|PUMPKIN|COMPOST|FISHSAUCE|BLOODBROTH|ALCOHOL|FISHCHOPS|SEAWEED|FISHINGBAIT|YEAST/i.test(b))return true;
+    if(/FISH_(FRESHWATER|SALTWATER)/i.test(b)&&!/_RARE|CHOPS/i.test(b))return true;
+    return false;
+  }},
+  {id:'potions',pl:'Potki',en:'Potions',keys:['potka','potion','mikstura'],match:b=>/POTION|POISON/i.test(b)},
   {id:'hunting_loot',pl:'Polowanie (szczątki / trofea)',en:'Hunting (remains / trophies)',keys:['polow','tracking','szczątk','remains','trofea','wildlife','alchemy_common'],match:b=>/TRACKING|TRACKINGITEM|WILDLIFE|HUNTING|ALCHEMY_COMMON|ALCHEMY_RARE/i.test(b)&&!/SKILLBOOK|TOME_WEAPON|ALCHEMY_EXTRACT/i.test(b)},
-  {id:'tome_hunt',pl:'Tomki z polowania',en:'Hunting tomes',keys:['polow','hunt','tom pol'],match:b=>/SKILLBOOK|TOME/i.test(b)&&/HUNT|WILDLIFE|TRACKING|SKINNER|GAME|TRAPPER/i.test(b)},
-  {id:'tomes',pl:'Tomki (skillbooki)',en:'Skill books (tomes)',keys:['tome','skillbook','tom'],match:b=>/SKILLBOOK|TOME_/i.test(b)},
   {id:'shields',pl:'Tarcze',en:'Shields',keys:['tarcza','shield'],match:b=>/SHIELD/.test(b)},
-  {id:'offhand',pl:'Off-hand (bez tarcz)',en:'Off-hand (no shields)',keys:['offhand','torch','księga','book','świeca','orbe'],match:b=>/^OFF_/.test(b)&&!/SHIELD/.test(b)},
+  {id:'offhand',pl:'Dłoń pomocnicza',en:'Off-hand (no shields)',keys:['offhand','torch','księga','book','świeca','orbe','dłoń pomoc'],match:b=>/^OFF_/.test(b)&&!/SHIELD/.test(b)},
   {id:'gather_gear',pl:'Zbieracz (ekwipunek)',en:'Gatherer gear',keys:['zbieracz','gather','gath'],match:b=>/^GATHERER_/.test(b)},
   {id:'bags',pl:'Torby / peleryny',en:'Bags / capes',keys:['torba','bag','cape','peleryn','sakwa'],match:b=>/^BAG|^CAPE|^SATCHEL/.test(b)},
-  {id:'consumables',pl:'Inne consumables',en:'Other consumables',keys:['consum','fish','bait','avatar'],match:b=>!/^MAIN_|^2H_|^OFF_|^HEAD_|^ARMOR_|^SHOES_|^GATHERER_/.test(b)&&/FISH|BREAD|AVATAR|BEAN/i.test(b)&&!/POTION|POISON|SKILLBOOK|FOOD|MEAL|OMELETTE/i.test(b)},
   {id:'mount',pl:'Wierzchowce',en:'Mounts',keys:['mount','koń','horse','wierzch','osioł'],match:b=>!/^MAIN_|^2H_|^OFF_|^ARMOR_|^HEAD_|^SHOES_/.test(b)&&/HORSE|OX|DIREWOLF|STAG|COUGAR|DONKEY|MULE|RAM/.test(b)},
   {id:'resources',pl:'Surowce / materiały',en:'Resources / materials',keys:['surow','ruda','ore','hide','skóra surow','fiber','włókno','wood','drewno','rock','kamień','plank','bar'],match:b=>!/^MAIN_|^2H_|^OFF_|^HEAD_|^ARMOR_|^SHOES_|^GATHERER_|^BAG|^CAPE/.test(b)&&/(^|_)(ORE|HIDE|FIBER|WOOD|ROCK|PLANKS|METALBAR|STONEBLOCK|REFINED|RAW|BLOCK)/.test(b)},
   {id:'tools',pl:'Narzędzia',en:'Tools',keys:['tool','narzęd','kilof','sickle','sierp'],match:b=>/SICKLE|SKINNING|MINING|LOGGING|QUARRY|FISHING|TOOL|HAMMER_TOOL/i.test(b)&&!/^MAIN_|^2H_|^ARMOR_|^HEAD_/.test(b)},
