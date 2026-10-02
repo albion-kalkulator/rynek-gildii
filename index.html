@@ -536,7 +536,7 @@ const ITEM_TYPE_KEYS = {
   'g_boots': {emoji:'🥾', n: 96},
   'g_bag':   {emoji:'🎽', n:192},
 };
-const APP_VERSION = 'rynek-gildii-20';
+const APP_VERSION = 'rynek-gildii-21';
 function ensureFreshHtmlVersion(){
   const k='ao_guild_html_ver';
   const prev=localStorage.getItem(k);
@@ -967,81 +967,55 @@ async function fetchGuildUserRow(query){
     return Array.isArray(rows)&&rows[0]?rows[0]:null;
   }catch(_){return null;}
 }
-async function verifyLoginAllowed(nick,ip){
+/** Zapis profilu w guild_users — IP tylko informacyjnie (odświeżane przy logowaniu), bez blokady logowania po IP. */
+async function upsertGuildUser(nick,ip,guildTag){
   const key=nickKey(nick);
   if(!key)return{ok:false,msg:'gm_profile_nick_required'};
-  if(!ip)return{ok:false,msg:'gm_login_verify_fail'};
-  const byNick=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(key)}`);
-  if(byNick){
-    if(byNick.ip===ip)return{ok:true,existing:true};
-    return{ok:false,msg:'gm_login_nick_taken'};
-  }
-  const byIp=await fetchGuildUserRow(`ip=eq.${encodeURIComponent(ip)}`);
-  if(byIp&&byIp.nick_key!==key)return{ok:false,msg:'gm_login_device_has_profile'};
-  return{ok:true,existing:false};
-}
-async function registerGuildUser(nick,ip,guildTag){
-  const key=nickKey(nick);
   const display=(nick||'').trim();
   const body={
-    nick_key:key,
     nick_display:display,
-    ip,
     guild_tag:(guildTag||'').trim()||null,
     updated_at:new Date().toISOString()
   };
+  if(ip)body.ip=ip;
+  const existing=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(key)}`);
   try{
+    if(existing){
+      const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(key)}`,{
+        method:'PATCH',headers:sbH(),body:JSON.stringify(body)
+      });
+      if(r.ok)return{ok:true};
+      if(r.status===401||r.status===403)return{ok:false,msg:'gm_rls_block'};
+      console.warn('guild_users PATCH',r.status,await r.text().catch(()=>''));
+      return{ok:false,msg:'gm_login_verify_fail'};
+    }
+    if(!ip)return{ok:true,skipped:true};
+    const postBody={nick_key:key,...body,ip};
     const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}`,{
       method:'POST',
-      headers:{...sbH(),Prefer:'return=representation'},
-      body:JSON.stringify(body)
+      headers:{...sbH(),Prefer:'return=minimal'},
+      body:JSON.stringify(postBody)
     });
     if(r.ok)return{ok:true};
-    if(r.status===409)return{ok:false,msg:'gm_login_nick_taken'};
+    if(r.status===409){
+      const r2=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(key)}`,{
+        method:'PATCH',headers:sbH(),body:JSON.stringify(body)
+      });
+      if(r2.ok)return{ok:true};
+    }
     if(r.status===401||r.status===403)return{ok:false,msg:'gm_rls_block'};
     console.warn('guild_users POST',r.status,await r.text().catch(()=>''));
     return{ok:false,msg:'gm_login_verify_fail'};
   }catch(e){
-    console.warn('guild_users POST error',e);
+    console.warn('guild_users upsert error',e);
     return{ok:false,msg:'gm_login_verify_fail'};
   }
 }
 async function ensureGuildUserProfile(){
   if(!cloudNick)return false;
   const ip=await getClientIp();
-  if(!ip)return false;
-  const key=nickKey(cloudNick);
-  const row=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(key)}`);
-  if(row)return row.ip===ip;
-  const gate=await verifyLoginAllowed(cloudNick,ip);
-  if(!gate.ok)return false;
-  if(gate.existing)return false;
-  const reg=await registerGuildUser(cloudNick,ip,cloudGuildTag);
-  return reg.ok;
-}
-async function touchGuildUser(nick,ip,guildTag){
-  const key=nickKey(nick);
-  const body={
-    guild_tag:(guildTag||'').trim()||null,
-    nick_display:(nick||'').trim(),
-    updated_at:new Date().toISOString()
-  };
-  try{
-    const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(key)}&ip=eq.${encodeURIComponent(ip)}`,{
-      method:'PATCH',
-      headers:sbH(),
-      body:JSON.stringify(body)
-    });
-    return r.ok;
-  }catch(_){return false;}
-}
-async function verifyCurrentSession(){
-  if(!cloudNick)return true;
-  const ip=await getClientIp();
-  if(!ip)return false;
-  const row=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(nickKey(cloudNick))}`);
-  if(!row)return true;
-  return row.ip===ip;
+  const up=await upsertGuildUser(cloudNick,ip,cloudGuildTag);
+  return up.ok;
 }
 async function changeGuildUserNick(oldNick,newNick,ip,guildTag){
   const oldKey=nickKey(oldNick);
@@ -1049,29 +1023,30 @@ async function changeGuildUserNick(oldNick,newNick,ip,guildTag){
   const display=(newNick||'').trim();
   if(!newKey)return{ok:false,msg:'gm_profile_nick_required'};
   if(newKey===oldKey){
-    await touchGuildUser(display,ip,guildTag);
+    await upsertGuildUser(display,ip,guildTag);
     return{ok:true};
   }
   const taken=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(newKey)}`);
   if(taken)return{ok:false,msg:'gm_nick_busy'};
   const me=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(oldKey)}`);
-  if(me&&me.ip!==ip)return{ok:false,msg:'gm_login_nick_taken'};
   const body={
     nick_key:newKey,
     nick_display:display,
     guild_tag:(guildTag||'').trim()||null,
     updated_at:new Date().toISOString()
   };
+  if(ip)body.ip=ip;
+  else if(me?.ip)body.ip=me.ip;
   try{
     if(me){
-      const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(oldKey)}&ip=eq.${encodeURIComponent(ip)}`,{
+      const r=await fetch(`${SB_URL}/rest/v1/${SB_USERS_TABLE}?nick_key=eq.${encodeURIComponent(oldKey)}`,{
         method:'PATCH',headers:sbH(),body:JSON.stringify(body)
       });
       if(r.ok)return{ok:true};
       if(r.status===409)return{ok:false,msg:'gm_nick_busy'};
       return{ok:false,msg:'gm_login_verify_fail'};
     }
-    return await registerGuildUser(display,ip,guildTag);
+    return await upsertGuildUser(display,ip,guildTag);
   }catch(_){return{ok:false,msg:'gm_login_verify_fail'};}
 }
 function listingFromBannedUser(l){
@@ -1267,7 +1242,6 @@ async function loadGuildMarket(){
 }
 async function saveGuildListing(payload,isUpdate,id){
   if(!cloudNick){guildStatus=t('gm_login_required');return false;}
-  if(!(await verifyCurrentSession())){guildStatus=t('gm_session_invalid');return false;}
   if(isNickBanned(cloudNick)){guildStatus=t('gm_banned');return false;}
   const clientIp=await getClientIp();
   if(clientIp&&isIpBanned(clientIp)){guildStatus=t('gm_ip_banned');return false;}
@@ -2749,7 +2723,7 @@ function buildLoginModal(){
       <button id="nick-confirm" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-d),#8a6a25);border:none;border-radius:10px;color:var(--gold-l);font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.5px">
         ${state.lang==='pl'?'Wejdź na rynek →':'Enter market →'}
       </button>
-      <div style="font-size:.72rem;color:var(--muted);margin-top:14px">${state.lang==='pl'?'Nick rezerwuje profil na tym urządzeniu. Z jednego urządzenia — jeden nick.':'Your nick reserves a profile on this device. One device — one nick.'}</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:14px">${state.lang==='pl'?'Nick nie jest hasłem — znający nick może publikować w Twoim imieniu. Ban dotyczy listy w bazie (nick/IP).':'Your nick is not a password — anyone who knows it can post as you. Bans use the database block list (nick/IP).'}</div>
     </div>
   </div>`;
 }
@@ -2868,40 +2842,14 @@ async function doLogin(nick,guildTag){
   const btn=document.getElementById('nick-confirm');
   if(btn)btn.disabled=true;
   const ip=await getClientIp();
-  if(!ip){
-    if(s){s.style.color='var(--red)';s.textContent=t('gm_login_no_ip');}
-    if(btn)btn.disabled=false;
-    return;
-  }
-  if(isIpBanned(ip)){
+  if(ip&&isIpBanned(ip)){
     if(s){s.style.color='var(--red)';s.textContent=t('gm_banned');}
     if(btn)btn.disabled=false;
     return;
   }
-  const gate=await verifyLoginAllowed(nick,ip);
-  if(!gate.ok){
-    if(s){s.style.color='var(--red)';s.textContent=t(gate.msg||'gm_login_verify_fail');}
-    if(btn)btn.disabled=false;
-    return;
-  }
-  if(!gate.existing){
-    const reg=await registerGuildUser(nick,ip,guildTag);
-    if(!reg.ok){
-      if(s){s.style.color='var(--red)';s.textContent=t(reg.msg||'gm_login_verify_fail');}
-      if(btn)btn.disabled=false;
-      return;
-    }
-  }else{
-    await touchGuildUser(nick,ip,guildTag);
-  }
-  const rowAfter=await fetchGuildUserRow(`nick_key=eq.${encodeURIComponent(nickKey(nick))}`);
-  if(!rowAfter){
-    if(s){s.style.color='var(--red)';s.textContent=t('gm_rls_block');}
-    if(btn)btn.disabled=false;
-    return;
-  }
-  if(rowAfter.ip!==ip){
-    if(s){s.style.color='var(--red)';s.textContent=t('gm_login_nick_taken');}
+  const up=await upsertGuildUser(nick,ip,guildTag);
+  if(!up.ok){
+    if(s){s.style.color='var(--red)';s.textContent=t(up.msg||'gm_login_verify_fail');}
     if(btn)btn.disabled=false;
     return;
   }
@@ -2969,14 +2917,6 @@ loadPrefs();
     bindLoginModal();
     const s=document.getElementById('nick-status');
     if(s){s.style.color='var(--red)';s.textContent=t('gm_banned');}
-  }else if(cloudNick&&!(await verifyCurrentSession())){
-    localStorage.removeItem('ao_nick');
-    cloudNick=null;
-    document.body.insertAdjacentHTML('beforeend',buildLoginModal());
-    bindLoginModal();
-    const s=document.getElementById('nick-status');
-    if(s){s.style.color='var(--red)';s.textContent=t('gm_session_invalid');}
-  }
   getItemDB().then(()=>render());
   render();
   if(cloudNick){
